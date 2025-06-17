@@ -1,0 +1,99 @@
+# requirements.txt
+
+# --- Core Data Science & Numerical Computing ---
+pandas>=1.5.0
+numpy>=1.23.0
+scipy>=1.9.0
+
+# --- Data Visualization ---
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.10.0
+bokeh>=2.4.0
+altair>=4.2.0
+plotnine>=0.10.0
+
+# --- Machine Learning & AI (General) ---
+scikit-learn>=1.1.0
+statsmodels>=0.13.0
+xgboost>=1.6.0
+lightgbm>=3.3.0
+catboost>=1.0.0
+
+# --- Deep Learning ---
+tensorflow>=2.10.0
+keras>=2.10.0
+torch>=1.13.0
+torchvision>=0.14.0
+torchaudio>=0.13.0
+
+# --- Natural Language Processing (NLP) ---
+nltk>=3.7
+spacy>=3.4.0 
+# Remember to download spaCy models separately, e.g., python -m spacy download en_core_web_sm
+transformers>=4.20.0
+sentencepiece
+sacremoses
+gensim>=4.2.0
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.12.0
+
+# --- Web Interaction & Scraping ---
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+scrapy>=2.6.0
+selenium>=4.5.0
+
+# --- File I/O & Data Formats ---
+openpyxl>=3.0.0
+xlrd>=2.0.0
+xlsxwriter>=3.0.0
+pyarrow>=9.0.0
+fastparquet>=0.8.0
+boto3 
+google-cloud-storage
+
+# --- API Interaction & Web Frameworks (Client-side or light server for tools) ---
+openai
+anthropic
+flask
+fastapi
+streamlit
+
+# --- Database Interaction ---
+psycopg2-binary
+mysql-connector-python
+pyodbc
+duckdb>=0.6.0
+
+# --- Workflow & Utilities ---
+tqdm>=4.64.0
+python-dotenv>=0.20.0
+dvc[all] 
+pre-commit
+
+# --- Specific to your existing Windows integration mentions ---
+pywin32>=304
+
+# --- For working with Spark (if Spark is set up) ---
+pyspark>=3.3.0
+
+# --- LLM Application Frameworks ---
+langchain>=0.0.300
+llama-index>=0.8.0
+
+# --- Geospatial (if needed) ---
+geopandas>=0.11.0
+shapely>=1.8.0
+fiona>=1.8.0
+pyproj>=3.3.0
+
+# --- Testing (Good practice for any research code) ---
+pytest>=7.0.0
+hypothesis>=6.0.0
+
+# --- Code Formatting & Linting (Developer experience) ---
+black>=22.0.0
+flake8>=5.0.0
+isort>=5.0.0
