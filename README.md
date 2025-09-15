@@ -23,7 +23,7 @@ The Data Science Kit is a robust, modular PowerShell installer that automates th
 
 2. **Set execution policy** (if needed)
    ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+   PowerShell -ExecutionPolicy Bypass -File .\Main-Installer.ps1
    ```
 
 3. **Run the installer**
@@ -234,3 +234,4 @@ Built for the Lectoraat Supply Chain Finance at Windesheim University of Applied
 ---
 
 **Need a specific tool setup?** Create an issue or contribute a new module to help the community!
+
