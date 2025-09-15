@@ -1,0 +1,160 @@
+﻿[2025-09-15 14:25:54] [INFO] 
+[2025-09-15 14:25:54] [INFO] ================================================================================
+[2025-09-15 14:25:54] [INFO]   INSTALLATION PROFILE SELECTION
+[2025-09-15 14:25:54] [INFO] ================================================================================
+[2025-09-15 14:26:03] [SUCCESS] Selected Profile: Minimal
+[2025-09-15 14:26:03] [INFO] Description: Document authoring with Python/R basics and Quarto
+[2025-09-15 14:26:03] [INFO] Components to install: Prerequisites, PackageManagers, Git, VSCode, Python, R, Quarto, BasicPackages
+[2025-09-15 14:26:03] [INFO] 
+[2025-09-15 14:26:03] [INFO] ================================================================================
+[2025-09-15 14:26:03] [INFO]   PRE-INSTALLATION SUMMARY
+[2025-09-15 14:26:03] [INFO] ================================================================================
+[2025-09-15 14:26:03] [INFO] Installation Target: Minimal Profile
+[2025-09-15 14:26:03] [INFO] Base Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts
+[2025-09-15 14:26:03] [INFO] Modules Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules
+[2025-09-15 14:26:03] [INFO] Requirements Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\requirements
+[2025-09-15 14:26:03] [INFO] Log File: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\Installation-Report-20250915-142554.txt
+[2025-09-15 14:26:03] [INFO] Force Reinstall: False
+[2025-09-15 14:26:03] [INFO] Skip Checks: False
+[2025-09-15 14:26:09] [INFO] 
+[2025-09-15 14:26:09] [INFO] ================================================================================
+[2025-09-15 14:26:09] [INFO]   BEGINNING INSTALLATION PROCESS
+[2025-09-15 14:26:09] [INFO] ================================================================================
+[2025-09-15 14:26:09] [INFO] 
+[2025-09-15 14:26:09] [INFO] ================================================================================
+[2025-09-15 14:26:09] [INFO]   PART 1: SYSTEM PREREQUISITES & INITIAL SETUP
+[2025-09-15 14:26:09] [INFO] ================================================================================
+[2025-09-15 14:26:10] [INFO] Executing: Administrator Privileges Verification...
+[2025-09-15 14:26:10] [SUCCESS] Completed: Administrator Privileges Verification (8ms)
+[2025-09-15 14:26:10] [INFO] Executing: PowerShell Execution Policy Configuration...
+[2025-09-15 14:26:10] [SUCCESS] Completed: PowerShell Execution Policy Configuration (3ms)
+[2025-09-15 14:26:10] [INFO] Executing: Internet Connectivity Check...
+[2025-09-15 14:26:10] [SUCCESS] Completed: Internet Connectivity Check (4ms)
+[2025-09-15 14:26:10] [INFO] Executing: System Requirements Validation...
+[2025-09-15 14:26:10] [ERROR] Failed: System Requirements Validation - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-SystemRequirements.ps1
+[2025-09-15 14:26:10] [INFO] Progress: System Prerequisites - 4/50 modules completed (8%)
+[2025-09-15 14:26:10] [INFO] 
+[2025-09-15 14:26:10] [INFO] ================================================================================
+[2025-09-15 14:26:10] [INFO]   PART 2: PACKAGE MANAGERS & SYSTEM TOOLS
+[2025-09-15 14:26:10] [INFO] ================================================================================
+[2025-09-15 14:26:10] [INFO] Executing: Chocolatey Package Manager...
+[2025-09-15 14:26:11] [SUCCESS] Completed: Chocolatey Package Manager (684ms)
+[2025-09-15 14:26:11] [INFO] Executing: Scoop Package Manager...
+[2025-09-15 14:26:11] [SUCCESS] Completed: Scoop Package Manager (5ms)
+[2025-09-15 14:26:11] [INFO] Executing: Windows Package Manager Verification...
+[2025-09-15 14:26:11] [SUCCESS] Completed: Windows Package Manager Verification (6ms)
+[2025-09-15 14:26:11] [INFO] Executing: Environment Variables Refresh...
+[2025-09-15 14:26:11] [SUCCESS] Completed: Environment Variables Refresh (3ms)
+[2025-09-15 14:26:11] [INFO] Progress: Package Managers - 8/50 modules completed (16%)
+[2025-09-15 14:26:11] [INFO] 
+[2025-09-15 14:26:11] [INFO] ================================================================================
+[2025-09-15 14:26:11] [INFO]   PART 3: ESSENTIAL DEVELOPER TOOLS
+[2025-09-15 14:26:11] [INFO] ================================================================================
+[2025-09-15 14:26:11] [INFO] Executing: Git Version Control System...
+[2025-09-15 14:26:25] [ERROR] Failed: Git Version Control System - Module exited with code: 1
+[2025-09-15 14:26:25] [ERROR] CRITICAL FAILURE in Git Version Control System - This may affect subsequent installations
+[2025-09-15 14:26:25] [INFO] Executing: Visual Studio Code Editor...
+[2025-09-15 14:26:31] [SUCCESS] Completed: Visual Studio Code Editor (5941ms)
+[2025-09-15 14:26:31] [INFO] Skipping Windows Terminal (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping 7-Zip File Archiver (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping Draw.io Desktop Diagramming (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Progress: Developer Tools - 13/50 modules completed (26%)
+[2025-09-15 14:26:31] [INFO] 
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [INFO]   PART 4: PYTHON ENVIRONMENT SETUP
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [WARNING] Skipping critical module Python Interpreter & Package Manager due to previous critical failure
+[2025-09-15 14:26:31] [INFO] Executing: Python Essential Packages...
+[2025-09-15 14:26:31] [ERROR] Failed: Python Essential Packages - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-PythonBasicPackages.ps1
+[2025-09-15 14:26:31] [INFO] Skipping Python Data Science Stack (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping Python AI/ML Frameworks (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping Python NLP & Text Processing (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Progress: Python Environment - 18/50 modules completed (36%)
+[2025-09-15 14:26:31] [INFO] 
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [INFO]   PART 5: R STATISTICAL ENVIRONMENT SETUP
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [WARNING] Skipping critical module R Statistical Computing Language due to previous critical failure
+[2025-09-15 14:26:31] [INFO] Executing: R Development Tools (Rtools)...
+[2025-09-15 14:26:31] [SUCCESS] Completed: R Development Tools (Rtools) (4ms)
+[2025-09-15 14:26:31] [INFO] Executing: R Essential Packages...
+[2025-09-15 14:26:31] [ERROR] Failed: R Essential Packages - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-RBasicPackages.ps1
+[2025-09-15 14:26:31] [INFO] Skipping R Data Science & Visualization (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping R Advanced Statistics & ML (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Progress: R Environment - 23/50 modules completed (46%)
+[2025-09-15 14:26:31] [INFO] 
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [INFO]   PART 6: DEVELOPMENT ENVIRONMENTS
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [INFO] Skipping RStudio IDE (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Skipping JupyterLab Interactive Environment (not included in Minimal profile)
+[2025-09-15 14:26:31] [INFO] Executing: VS Code Extensions for Data Science...
+[2025-09-15 14:26:31] [ERROR] Failed: VS Code Extensions for Data Science - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-VSCodeExtensions.ps1
+[2025-09-15 14:26:31] [INFO] Progress: Development Environments - 26/50 modules completed (52%)
+[2025-09-15 14:26:31] [INFO] 
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:31] [INFO]   PART 7: PUBLISHING & DOCUMENTATION TOOLS
+[2025-09-15 14:26:31] [INFO] ================================================================================
+[2025-09-15 14:26:32] [WARNING] Skipping critical module Quarto Publishing System due to previous critical failure
+[2025-09-15 14:26:32] [INFO] Executing: TinyTeX LaTeX Distribution...
+[2025-09-15 14:26:40] [ERROR] Failed: TinyTeX LaTeX Distribution - Module exited with code: 1
+[2025-09-15 14:26:40] [INFO] Executing: Pandoc Document Converter...
+[2025-09-15 14:26:40] [ERROR] Failed: Pandoc Document Converter - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-Pandoc.ps1
+[2025-09-15 14:26:40] [INFO] Executing: Quarto Extensions...
+[2025-09-15 14:26:40] [ERROR] Failed: Quarto Extensions - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-QuartoExtensions.ps1
+[2025-09-15 14:26:40] [INFO] Progress: Publishing Tools - 30/50 modules completed (60%)
+[2025-09-15 14:26:40] [INFO] 
+[2025-09-15 14:26:40] [INFO] ================================================================================
+[2025-09-15 14:26:40] [INFO]   PART 8: DATABASE & DATA MANAGEMENT TOOLS
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO] Skipping Database GUI Tools (DBeaver, etc.) (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping SQLite Database Tools (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Database Connectors & Drivers (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Progress: Database Tools - 33/50 modules completed (66%)
+[2025-09-15 14:26:41] [INFO] 
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO]   PART 9: BIG DATA & DISTRIBUTED COMPUTING
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO] Skipping Java Development Kit (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Apache Spark & Hadoop (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Spark Python/R Integration (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Cloud Platform Tools (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Progress: Big Data Stack - 37/50 modules completed (74%)
+[2025-09-15 14:26:41] [INFO] 
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO]   PART 10: SPECIALIZED TOOLS & UTILITIES
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO] Skipping Custom Fonts for Publications (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Media Processing Tools (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Graph Visualization Tools (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Skipping Docker Containerization (not included in Minimal profile)
+[2025-09-15 14:26:41] [INFO] Progress: Specialized Tools - 41/50 modules completed (82%)
+[2025-09-15 14:26:41] [INFO] 
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO]   PART 11: SYSTEM CONFIGURATION & OPTIMIZATION
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO] Executing: Environment Variables Configuration...
+[2025-09-15 14:26:41] [ERROR] Failed: Environment Variables Configuration - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-EnvironmentVariables.ps1
+[2025-09-15 14:26:41] [INFO] Executing: PATH Environment Optimization...
+[2025-09-15 14:26:41] [ERROR] Failed: PATH Environment Optimization - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-PathOptimization.ps1
+[2025-09-15 14:26:41] [INFO] Executing: PowerShell Profile Configuration...
+[2025-09-15 14:26:41] [ERROR] Failed: PowerShell Profile Configuration - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-PowerShellProfile.ps1
+[2025-09-15 14:26:41] [INFO] Executing: Optional Windows Features...
+[2025-09-15 14:26:41] [ERROR] Failed: Optional Windows Features - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-WindowsFeatures.ps1
+[2025-09-15 14:26:41] [INFO] Progress: System Configuration - 45/50 modules completed (90%)
+[2025-09-15 14:26:41] [INFO] 
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO]   PART 12: FINAL VERIFICATION & TESTING
+[2025-09-15 14:26:41] [INFO] ================================================================================
+[2025-09-15 14:26:41] [INFO] Executing: Python Environment Verification...
+[2025-09-15 14:26:42] [ERROR] Failed: Python Environment Verification - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-PythonEnvironment.ps1
+[2025-09-15 14:26:42] [INFO] Executing: R Environment Verification...
+[2025-09-15 14:26:42] [ERROR] Failed: R Environment Verification - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-REnvironment.ps1
+[2025-09-15 14:26:42] [INFO] Executing: Quarto Publishing Verification...
+[2025-09-15 14:26:42] [ERROR] Failed: Quarto Publishing Verification - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-QuartoEnvironment.ps1
+[2025-09-15 14:26:42] [INFO] Skipping Database Connectivity Tests (not included in Minimal profile)
+[2025-09-15 14:26:42] [WARNING] Skipping critical module Environment Status Report Generation due to previous critical failure
+[2025-09-15 14:26:42] [INFO] Progress: Final Verification - 50/50 modules completed (100%)
+[2025-09-15 14:26:42] [INFO] 
+[2025-09-15 14:26:42] [INFO] ================================================================================
+[2025-09-15 14:26:42] [INFO]   INSTALLATION SUMMARY

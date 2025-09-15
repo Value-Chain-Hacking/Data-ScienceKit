@@ -1,0 +1,174 @@
+﻿{
+    "Profiles":  {
+
+                 },
+    "EnvironmentVariables":  {
+                                 "R_HOME":  {
+                                                "Description":  "R Installation Directory",
+                                                "Name":  "R_HOME",
+                                                "Value":  null,
+                                                "IsSet":  false
+                                            },
+                                 "PYTHONPATH":  {
+                                                    "Description":  "Python Module Search Path",
+                                                    "Name":  "PYTHONPATH",
+                                                    "Value":  null,
+                                                    "IsSet":  false
+                                                },
+                                 "CHOCOLATEYINSTALL":  {
+                                                           "Description":  "Chocolatey Installation Directory",
+                                                           "Name":  "CHOCOLATEYINSTALL",
+                                                           "Value":  "C:\\ProgramData\\chocolatey",
+                                                           "IsSet":  true
+                                                       },
+                                 "QUARTO_HOME":  {
+                                                     "Description":  "Quarto Installation Directory",
+                                                     "Name":  "QUARTO_HOME",
+                                                     "Value":  null,
+                                                     "IsSet":  false
+                                                 },
+                                 "PATH":  {
+                                              "Description":  "System PATH",
+                                              "Name":  "PATH",
+                                              "Value":  null,
+                                              "IsSet":  false
+                                          },
+                                 "PYTHON_HOME":  {
+                                                     "Description":  "Python Installation Directory",
+                                                     "Name":  "PYTHON_HOME",
+                                                     "Value":  null,
+                                                     "IsSet":  false
+                                                 },
+                                 "JAVA_HOME":  {
+                                                   "Description":  "Java Installation Directory",
+                                                   "Name":  "JAVA_HOME",
+                                                   "Value":  null,
+                                                   "IsSet":  false
+                                               }
+                             },
+    "Tools":  {
+                  "pip":  {
+                              "Version":  "Not found",
+                              "Name":  "pip",
+                              "Description":  "Python Package Manager",
+                              "Path":  "",
+                              "Available":  false,
+                              "Critical":  true
+                          },
+                  "node":  {
+                               "Version":  "Not found",
+                               "Name":  "node",
+                               "Description":  "Node.js Runtime",
+                               "Path":  "",
+                               "Available":  false,
+                               "Critical":  false
+                           },
+                  "choco":  {
+                                "Version":  "Not found",
+                                "Name":  "choco",
+                                "Description":  "Chocolatey Package Manager",
+                                "Path":  "",
+                                "Available":  false,
+                                "Critical":  true
+                            },
+                  "java":  {
+                               "Version":  "Not found",
+                               "Name":  "java",
+                               "Description":  "Java Runtime Environment",
+                               "Path":  "",
+                               "Available":  false,
+                               "Critical":  false
+                           },
+                  "python":  {
+                                 "Version":  "Not found",
+                                 "Name":  "python",
+                                 "Description":  "Python Interpreter",
+                                 "Path":  "",
+                                 "Available":  false,
+                                 "Critical":  true
+                             },
+                  "git":  {
+                              "Version":  "Not found",
+                              "Name":  "git",
+                              "Description":  "Git Version Control",
+                              "Path":  "",
+                              "Available":  false,
+                              "Critical":  true
+                          },
+                  "code":  {
+                               "Version":  "Not found",
+                               "Name":  "code",
+                               "Description":  "Visual Studio Code",
+                               "Path":  "",
+                               "Available":  false,
+                               "Critical":  false
+                           },
+                  "quarto":  {
+                                 "Version":  "Not found",
+                                 "Name":  "quarto",
+                                 "Description":  "Quarto Publishing System",
+                                 "Path":  "",
+                                 "Available":  false,
+                                 "Critical":  true
+                             },
+                  "R":  {
+                            "Version":  "Available (version check failed)",
+                            "Name":  "R",
+                            "Description":  "R Statistical Computing",
+                            "Path":  "",
+                            "Available":  true,
+                            "Critical":  true
+                        },
+                  "scoop":  {
+                                "Version":  "Not found",
+                                "Name":  "scoop",
+                                "Description":  "Scoop Package Manager",
+                                "Path":  "",
+                                "Available":  false,
+                                "Critical":  false
+                            },
+                  "npm":  {
+                              "Version":  "Not found",
+                              "Name":  "npm",
+                              "Description":  "Node Package Manager",
+                              "Path":  "",
+                              "Available":  false,
+                              "Critical":  false
+                          },
+                  "jupyter":  {
+                                  "Version":  "Not found",
+                                  "Name":  "jupyter",
+                                  "Description":  "Jupyter Notebook",
+                                  "Path":  "",
+                                  "Available":  false,
+                                  "Critical":  false
+                              }
+              },
+    "MachineName":  "GIFTFROMKIRSTEN",
+    "GeneratedAt":  {
+                        "value":  "\/Date(1757940326735)\/",
+                        "DisplayHint":  2,
+                        "DateTime":  "Monday, September 15, 2025 2:45:26 PM"
+                    },
+    "UserName":  "Christiaan",
+    "Summary":  {
+                    "CriticalIssues":  [
+                                           "choco (Critical): Chocolatey Package Manager",
+                                           "git (Critical): Git Version Control",
+                                           "python (Critical): Python Interpreter",
+                                           "pip (Critical): Python Package Manager",
+                                           "quarto (Critical): Quarto Publishing System"
+                                       ],
+                    "Warnings":  [
+                                     "scoop: Scoop Package Manager",
+                                     "java: Java Runtime Environment",
+                                     "code: Visual Studio Code",
+                                     "jupyter: Jupyter Notebook",
+                                     "node: Node.js Runtime",
+                                     "npm: Node Package Manager"
+                                 ],
+                    "ToolsMissing":  11,
+                    "ToolsAvailable":  1,
+                    "TotalToolsChecked":  12
+                }
+}

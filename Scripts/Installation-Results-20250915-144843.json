@@ -1,0 +1,430 @@
+﻿{
+    "DetailedResults":  {
+                            "Install-RAdvancedPackages.ps1":  {
+                                                                  "Status":  "Skipped",
+                                                                  "Description":  "R Advanced Statistics \u0026 ML",
+                                                                  "Component":  "AI_MLPackages",
+                                                                  "Reason":  "Not included in profile"
+                                                              },
+                            "Configure-EnvironmentVariables.ps1":  {
+                                                                       "Component":  "Prerequisites",
+                                                                       "Description":  "Environment Variables Configuration",
+                                                                       "ExitCode":  1,
+                                                                       "ExecutionTime":  0,
+                                                                       "Status":  "Failed",
+                                                                       "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Configure-EnvironmentVariables.ps1"
+                                                                   },
+                            "Test-PythonEnvironment.ps1":  {
+                                                               "Component":  "Python",
+                                                               "Description":  "Python Environment Verification",
+                                                               "ExitCode":  1,
+                                                               "ExecutionTime":  0,
+                                                               "Status":  "Failed",
+                                                               "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Test-PythonEnvironment.ps1"
+                                                           },
+                            "Install-DockerDesktop.ps1":  {
+                                                              "Status":  "Skipped",
+                                                              "Description":  "Docker Containerization",
+                                                              "Component":  "OptionalTools",
+                                                              "Reason":  "Not included in profile"
+                                                          },
+                            "Install-DrawIO.ps1":  {
+                                                       "Status":  "Skipped",
+                                                       "Description":  "Draw.io Desktop Diagramming",
+                                                       "Component":  "Utilities",
+                                                       "Reason":  "Not included in profile"
+                                                   },
+                            "Test-InternetConnection.ps1":  {
+                                                                "ExecutionTime":  2,
+                                                                "Status":  "Success",
+                                                                "Description":  "Internet Connectivity Check",
+                                                                "Component":  "Prerequisites",
+                                                                "ExitCode":  0
+                                                            },
+                            "Install-RBasicPackages.ps1":  {
+                                                               "Status":  "Skipped",
+                                                               "Description":  "R Essential Packages",
+                                                               "Component":  "BasicPackages",
+                                                               "Reason":  "Not included in profile"
+                                                           },
+                            "Install-DatabaseTools.ps1":  {
+                                                              "Status":  "Skipped",
+                                                              "Description":  "Database GUI Tools (DBeaver, etc.)",
+                                                              "Component":  "DatabaseTools",
+                                                              "Reason":  "Not included in profile"
+                                                          },
+                            "Install-Pandoc.ps1":  {
+                                                       "Component":  "Quarto",
+                                                       "Description":  "Pandoc Document Converter",
+                                                       "ExitCode":  1,
+                                                       "ExecutionTime":  0,
+                                                       "Status":  "Failed",
+                                                       "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Install-Pandoc.ps1"
+                                                   },
+                            "Install-Git.ps1":  {
+                                                    "Component":  "Git",
+                                                    "Description":  "Git Version Control System",
+                                                    "ExitCode":  1,
+                                                    "ExecutionTime":  70,
+                                                    "Status":  "Failed",
+                                                    "ErrorMessage":  "Module exited with code: 1"
+                                                },
+                            "Install-JupyterLab.ps1":  {
+                                                           "Status":  "Skipped",
+                                                           "Description":  "JupyterLab Interactive Environment",
+                                                           "Component":  "DataSciencePackages",
+                                                           "Reason":  "Not included in profile"
+                                                       },
+                            "Set-ExecutionPolicyForProcess.ps1":  {
+                                                                      "ExecutionTime":  11,
+                                                                      "Status":  "Success",
+                                                                      "Description":  "PowerShell Execution Policy Configuration",
+                                                                      "Component":  "Prerequisites",
+                                                                      "ExitCode":  0
+                                                                  },
+                            "Test-WingetAvailability.ps1":  {
+                                                                "ExecutionTime":  2,
+                                                                "Status":  "Success",
+                                                                "Description":  "Windows Package Manager Verification",
+                                                                "Component":  "PackageManagers",
+                                                                "ExitCode":  0
+                                                            },
+                            "Install-GraphvizTools.ps1":  {
+                                                              "Status":  "Skipped",
+                                                              "Description":  "Graph Visualization Tools",
+                                                              "Component":  "OptionalTools",
+                                                              "Reason":  "Not included in profile"
+                                                          },
+                            "Test-SystemRequirements.ps1":  {
+                                                                "Component":  "Prerequisites",
+                                                                "Description":  "System Requirements Validation",
+                                                                "ExitCode":  0,
+                                                                "ExecutionTime":  0,
+                                                                "Status":  "Failed",
+                                                                "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Test-SystemRequirements.ps1"
+                                                            },
+                            "Install-PythonDataSciencePackages.ps1":  {
+                                                                          "Status":  "Skipped",
+                                                                          "Description":  "Python Data Science Stack",
+                                                                          "Component":  "DataSciencePackages",
+                                                                          "Reason":  "Not included in profile"
+                                                                      },
+                            "Install-SparkConnectors.ps1":  {
+                                                                "Status":  "Skipped",
+                                                                "Description":  "Spark Python/R Integration",
+                                                                "Component":  "BigDataStack",
+                                                                "Reason":  "Not included in profile"
+                                                            },
+                            "Test-REnvironment.ps1":  {
+                                                          "Status":  "Skipped",
+                                                          "Description":  "R Environment Verification",
+                                                          "Component":  "R",
+                                                          "Reason":  "Not included in profile"
+                                                      },
+                            "Install-WindowsFeatures.ps1":  {
+                                                                "Component":  "Prerequisites",
+                                                                "Description":  "Optional Windows Features",
+                                                                "ExitCode":  1,
+                                                                "ExecutionTime":  0,
+                                                                "Status":  "Failed",
+                                                                "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Install-WindowsFeatures.ps1"
+                                                            },
+                            "Install-JavaJDK.ps1":  {
+                                                        "Status":  "Skipped",
+                                                        "Description":  "Java Development Kit",
+                                                        "Component":  "BigDataStack",
+                                                        "Reason":  "Not included in profile"
+                                                    },
+                            "Generate-EnvironmentReport.ps1":  {
+                                                                   "Status":  "Skipped",
+                                                                   "Description":  "Environment Status Report Generation",
+                                                                   "Component":  "Prerequisites",
+                                                                   "Reason":  "Previous critical failure"
+                                                               },
+                            "Configure-VSCodeExtensions.ps1":  {
+                                                                   "Status":  "Skipped",
+                                                                   "Description":  "VS Code Extensions for Data Science",
+                                                                   "Component":  "VSCode",
+                                                                   "Reason":  "Not included in profile"
+                                                               },
+                            "Install-SQLiteTools.ps1":  {
+                                                            "Status":  "Skipped",
+                                                            "Description":  "SQLite Database Tools",
+                                                            "Component":  "DatabaseTools",
+                                                            "Reason":  "Not included in profile"
+                                                        },
+                            "Install-RStudio.ps1":  {
+                                                        "Status":  "Skipped",
+                                                        "Description":  "RStudio IDE",
+                                                        "Component":  "RStudio",
+                                                        "Reason":  "Not included in profile"
+                                                    },
+                            "Verify-AdminPrivileges.ps1":  {
+                                                               "ExecutionTime":  12,
+                                                               "Status":  "Success",
+                                                               "Description":  "Administrator Privileges Verification",
+                                                               "Component":  "Prerequisites",
+                                                               "ExitCode":  0
+                                                           },
+                            "Test-DatabaseConnections.ps1":  {
+                                                                 "Status":  "Skipped",
+                                                                 "Description":  "Database Connectivity Tests",
+                                                                 "Component":  "DatabaseTools",
+                                                                 "Reason":  "Not included in profile"
+                                                             },
+                            "Install-WindowsTerminal.ps1":  {
+                                                                "Status":  "Skipped",
+                                                                "Description":  "Windows Terminal",
+                                                                "Component":  "WindowsTerminal",
+                                                                "Reason":  "Not included in profile"
+                                                            },
+                            "Install-DataConnectors.ps1":  {
+                                                               "Status":  "Skipped",
+                                                               "Description":  "Database Connectors \u0026 Drivers",
+                                                               "Component":  "DatabaseTools",
+                                                               "Reason":  "Not included in profile"
+                                                           },
+                            "Install-FFmpeg.ps1":  {
+                                                       "Status":  "Skipped",
+                                                       "Description":  "Media Processing Tools",
+                                                       "Component":  "OptionalTools",
+                                                       "Reason":  "Not included in profile"
+                                                   },
+                            "Install-ApacheSpark.ps1":  {
+                                                            "Status":  "Skipped",
+                                                            "Description":  "Apache Spark \u0026 Hadoop",
+                                                            "Component":  "BigDataStack",
+                                                            "Reason":  "Not included in profile"
+                                                        },
+                            "Install-QuartoCLI.ps1":  {
+                                                          "Status":  "Skipped",
+                                                          "Description":  "Quarto Publishing System",
+                                                          "Component":  "Quarto",
+                                                          "Reason":  "Previous critical failure"
+                                                      },
+                            "Test-QuartoEnvironment.ps1":  {
+                                                               "Component":  "Quarto",
+                                                               "Description":  "Quarto Publishing Verification",
+                                                               "ExitCode":  1,
+                                                               "ExecutionTime":  0,
+                                                               "Status":  "Failed",
+                                                               "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Test-QuartoEnvironment.ps1"
+                                                           },
+                            "Install-QuartoExtensions.ps1":  {
+                                                                 "Component":  "Quarto",
+                                                                 "Description":  "Quarto Extensions",
+                                                                 "ExitCode":  1,
+                                                                 "ExecutionTime":  0,
+                                                                 "Status":  "Failed",
+                                                                 "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Install-QuartoExtensions.ps1"
+                                                             },
+                            "Configure-PathOptimization.ps1":  {
+                                                                   "Component":  "Prerequisites",
+                                                                   "Description":  "PATH Environment Optimization",
+                                                                   "ExitCode":  1,
+                                                                   "ExecutionTime":  0,
+                                                                   "Status":  "Failed",
+                                                                   "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Configure-PathOptimization.ps1"
+                                                               },
+                            "Install-RCore.ps1":  {
+                                                      "Status":  "Skipped",
+                                                      "Description":  "R Statistical Computing Language",
+                                                      "Component":  "R",
+                                                      "Reason":  "Not included in profile"
+                                                  },
+                            "Install-RTools.ps1":  {
+                                                       "Status":  "Skipped",
+                                                       "Description":  "R Development Tools (Rtools)",
+                                                       "Component":  "R",
+                                                       "Reason":  "Not included in profile"
+                                                   },
+                            "Install-7Zip.ps1":  {
+                                                     "Status":  "Skipped",
+                                                     "Description":  "7-Zip File Archiver",
+                                                     "Component":  "Utilities",
+                                                     "Reason":  "Not included in profile"
+                                                 },
+                            "Install-RDataSciencePackages.ps1":  {
+                                                                     "Status":  "Skipped",
+                                                                     "Description":  "R Data Science \u0026 Visualization",
+                                                                     "Component":  "DataSciencePackages",
+                                                                     "Reason":  "Not included in profile"
+                                                                 },
+                            "Install-Scoop.ps1":  {
+                                                      "ExecutionTime":  2,
+                                                      "Status":  "Success",
+                                                      "Description":  "Scoop Package Manager",
+                                                      "Component":  "PackageManagers",
+                                                      "ExitCode":  0
+                                                  },
+                            "Install-PythonBasicPackages.ps1":  {
+                                                                    "Status":  "Skipped",
+                                                                    "Description":  "Python Essential Packages",
+                                                                    "Component":  "BasicPackages",
+                                                                    "Reason":  "Not included in profile"
+                                                                },
+                            "Install-Chocolatey.ps1":  {
+                                                           "ExecutionTime":  387,
+                                                           "Status":  "Success",
+                                                           "Description":  "Chocolatey Package Manager",
+                                                           "Component":  "PackageManagers",
+                                                           "ExitCode":  0
+                                                       },
+                            "Install-PythonCore.ps1":  {
+                                                           "Status":  "Skipped",
+                                                           "Description":  "Python Interpreter \u0026 Package Manager",
+                                                           "Component":  "Python",
+                                                           "Reason":  "Previous critical failure"
+                                                       },
+                            "Install-CloudTools.ps1":  {
+                                                           "Status":  "Skipped",
+                                                           "Description":  "Cloud Platform Tools",
+                                                           "Component":  "BigDataStack",
+                                                           "Reason":  "Not included in profile"
+                                                       },
+                            "Install-CustomFonts.ps1":  {
+                                                            "Status":  "Skipped",
+                                                            "Description":  "Custom Fonts for Publications",
+                                                            "Component":  "CustomFonts",
+                                                            "Reason":  "Not included in profile"
+                                                        },
+                            "Install-VSCode.ps1":  {
+                                                       "Status":  "Skipped",
+                                                       "Description":  "Visual Studio Code Editor",
+                                                       "Component":  "VSCode",
+                                                       "Reason":  "Not included in profile"
+                                                   },
+                            "Install-PythonNLPPackages.ps1":  {
+                                                                  "Status":  "Skipped",
+                                                                  "Description":  "Python NLP \u0026 Text Processing",
+                                                                  "Component":  "NLPPackages",
+                                                                  "Reason":  "Not included in profile"
+                                                              },
+                            "Install-PythonAIMLPackages.ps1":  {
+                                                                   "Status":  "Skipped",
+                                                                   "Description":  "Python AI/ML Frameworks",
+                                                                   "Component":  "AI_MLPackages",
+                                                                   "Reason":  "Not included in profile"
+                                                               },
+                            "Configure-PowerShellProfile.ps1":  {
+                                                                    "Component":  "Prerequisites",
+                                                                    "Description":  "PowerShell Profile Configuration",
+                                                                    "ExitCode":  1,
+                                                                    "ExecutionTime":  0,
+                                                                    "Status":  "Failed",
+                                                                    "ErrorMessage":  "Module file not found: C:\\Users\\Christiaan\\Documents\\GitHub\\Data-ScienceKit\\Scripts\\modules\\Configure-PowerShellProfile.ps1"
+                                                                },
+                            "Install-TinyTeX.ps1":  {
+                                                        "Component":  "Quarto",
+                                                        "Description":  "TinyTeX LaTeX Distribution",
+                                                        "ExitCode":  1,
+                                                        "ExecutionTime":  72,
+                                                        "Status":  "Failed",
+                                                        "ErrorMessage":  "Module exited with code: 1"
+                                                    }
+                        },
+    "InstallationStartTime":  "\/Date(1757940520164)\/",
+    "CriticalFailures":  true,
+    "ProfileSelected":  "RecilienceScan",
+    "InstallationEndTime":  "\/Date(1757940523270)\/",
+    "TotalDuration":  0.051761488333333334,
+    "ComponentResults":  {
+                             "BasicPackages":  {
+                                                   "Failed":  0,
+                                                   "Skipped":  2,
+                                                   "Success":  0
+                                               },
+                             "PackageManagers":  {
+                                                     "Failed":  0,
+                                                     "Skipped":  0,
+                                                     "Success":  3
+                                                 },
+                             "VSCode":  {
+                                            "Failed":  0,
+                                            "Skipped":  2,
+                                            "Success":  0
+                                        },
+                             "RStudio":  {
+                                             "Failed":  0,
+                                             "Skipped":  1,
+                                             "Success":  0
+                                         },
+                             "CustomFonts":  {
+                                                 "Failed":  0,
+                                                 "Skipped":  1,
+                                                 "Success":  0
+                                             },
+                             "OptionalTools":  {
+                                                   "Failed":  0,
+                                                   "Skipped":  3,
+                                                   "Success":  0
+                                               },
+                             "DatabaseTools":  {
+                                                   "Failed":  0,
+                                                   "Skipped":  4,
+                                                   "Success":  0
+                                               },
+                             "Quarto":  {
+                                            "Failed":  4,
+                                            "Skipped":  1,
+                                            "Success":  0
+                                        },
+                             "AI_MLPackages":  {
+                                                   "Failed":  0,
+                                                   "Skipped":  2,
+                                                   "Success":  0
+                                               },
+                             "BigDataStack":  {
+                                                  "Failed":  0,
+                                                  "Skipped":  4,
+                                                  "Success":  0
+                                              },
+                             "Prerequisites":  {
+                                                   "Failed":  5,
+                                                   "Skipped":  1,
+                                                   "Success":  3
+                                               },
+                             "WindowsTerminal":  {
+                                                     "Failed":  0,
+                                                     "Skipped":  1,
+                                                     "Success":  0
+                                                 },
+                             "Python":  {
+                                            "Failed":  1,
+                                            "Skipped":  1,
+                                            "Success":  0
+                                        },
+                             "Utilities":  {
+                                               "Failed":  0,
+                                               "Skipped":  2,
+                                               "Success":  0
+                                           },
+                             "Git":  {
+                                         "Failed":  1,
+                                         "Skipped":  0,
+                                         "Success":  0
+                                     },
+                             "DataSciencePackages":  {
+                                                         "Failed":  0,
+                                                         "Skipped":  3,
+                                                         "Success":  0
+                                                     },
+                             "NLPPackages":  {
+                                                 "Failed":  0,
+                                                 "Skipped":  1,
+                                                 "Success":  0
+                                             },
+                             "R":  {
+                                       "Failed":  0,
+                                       "Skipped":  3,
+                                       "Success":  0
+                                   }
+                         },
+    "Statistics":  {
+                       "ModulesExecuted":  17,
+                       "ModulesFailed":  11,
+                       "ModulesSucceeded":  6,
+                       "ModulesSkipped":  32
+                   },
+    "OverallSuccess":  false
+}

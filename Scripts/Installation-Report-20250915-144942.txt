@@ -1,0 +1,183 @@
+﻿[2025-09-15 14:49:42] [INFO] Profile specified via parameter: RecilienceScan
+[2025-09-15 14:49:42] [SUCCESS] Selected Profile: RecilienceScan
+[2025-09-15 14:49:42] [INFO] Description: Minimal setup for RecilienceScan report automation pipeline
+[2025-09-15 14:49:42] [INFO] Components to install: Prerequisites, PackageManagers, Git, Python, Quarto
+[2025-09-15 14:49:42] [INFO] 
+[2025-09-15 14:49:42] [INFO] ================================================================================
+[2025-09-15 14:49:42] [INFO]   PRE-INSTALLATION SUMMARY
+[2025-09-15 14:49:42] [INFO] ================================================================================
+[2025-09-15 14:49:42] [INFO] Installation Target: RecilienceScan Profile
+[2025-09-15 14:49:42] [INFO] Base Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts
+[2025-09-15 14:49:42] [INFO] Modules Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules
+[2025-09-15 14:49:42] [INFO] Requirements Directory: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\requirements
+[2025-09-15 14:49:42] [INFO] Log File: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\Installation-Report-20250915-144942.txt
+[2025-09-15 14:49:42] [INFO] Force Reinstall: False
+[2025-09-15 14:49:42] [INFO] Skip Checks: False
+[2025-09-15 14:49:43] [INFO] 
+[2025-09-15 14:49:43] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO]   BEGINNING INSTALLATION PROCESS
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO] 
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO]   PART 1: SYSTEM PREREQUISITES & INITIAL SETUP
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO] Executing: Administrator Privileges Verification...
+[2025-09-15 14:49:44] [SUCCESS] Completed: Administrator Privileges Verification (12ms)
+[2025-09-15 14:49:44] [INFO] Executing: PowerShell Execution Policy Configuration...
+[2025-09-15 14:49:44] [SUCCESS] Completed: PowerShell Execution Policy Configuration (12ms)
+[2025-09-15 14:49:44] [INFO] Executing: Internet Connectivity Check...
+[2025-09-15 14:49:44] [SUCCESS] Completed: Internet Connectivity Check (2ms)
+[2025-09-15 14:49:44] [INFO] Executing: System Requirements Validation...
+[2025-09-15 14:49:44] [ERROR] Failed: System Requirements Validation - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-SystemRequirements.ps1
+[2025-09-15 14:49:44] [INFO] Progress: System Prerequisites - 4/50 modules completed (8%)
+[2025-09-15 14:49:44] [INFO] 
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO]   PART 2: PACKAGE MANAGERS & SYSTEM TOOLS
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO] Executing: Chocolatey Package Manager...
+[2025-09-15 14:49:44] [SUCCESS] Completed: Chocolatey Package Manager (194ms)
+[2025-09-15 14:49:44] [INFO] Executing: Scoop Package Manager...
+[2025-09-15 14:49:44] [SUCCESS] Completed: Scoop Package Manager (2ms)
+[2025-09-15 14:49:44] [INFO] Executing: Windows Package Manager Verification...
+[2025-09-15 14:49:44] [SUCCESS] Completed: Windows Package Manager Verification (2ms)
+[2025-09-15 14:49:44] [INFO] Progress: Package Managers - 8/50 modules completed (16%)
+[2025-09-15 14:49:44] [INFO] 
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO]   PART 3: ESSENTIAL DEVELOPER TOOLS
+[2025-09-15 14:49:44] [INFO] ================================================================================
+[2025-09-15 14:49:44] [INFO] Executing: Git Version Control System...
+[2025-09-15 14:49:44] [ERROR] Failed: Git Version Control System - Module exited with code: 1
+[2025-09-15 14:49:44] [ERROR] CRITICAL FAILURE in Git Version Control System - This may affect subsequent installations
+[2025-09-15 14:49:44] [INFO] Skipping Visual Studio Code Editor (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping Windows Terminal (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping 7-Zip File Archiver (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping Draw.io Desktop Diagramming (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Progress: Developer Tools - 13/50 modules completed (26%)
+[2025-09-15 14:49:45] [INFO] 
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO]   PART 4: PYTHON ENVIRONMENT SETUP
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [WARNING] Skipping critical module Python Interpreter & Package Manager due to previous critical failure
+[2025-09-15 14:49:45] [INFO] Skipping Python Essential Packages (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping Python Data Science Stack (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping Python AI/ML Frameworks (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping Python NLP & Text Processing (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Progress: Python Environment - 18/50 modules completed (36%)
+[2025-09-15 14:49:45] [INFO] 
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO]   PART 5: R STATISTICAL ENVIRONMENT SETUP
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO] Skipping R Statistical Computing Language (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping R Development Tools (Rtools) (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping R Essential Packages (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping R Data Science & Visualization (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping R Advanced Statistics & ML (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Progress: R Environment - 23/50 modules completed (46%)
+[2025-09-15 14:49:45] [INFO] 
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO]   PART 6: DEVELOPMENT ENVIRONMENTS
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO] Skipping RStudio IDE (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping JupyterLab Interactive Environment (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Skipping VS Code Extensions for Data Science (not included in RecilienceScan profile)
+[2025-09-15 14:49:45] [INFO] Progress: Development Environments - 26/50 modules completed (52%)
+[2025-09-15 14:49:45] [INFO] 
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO]   PART 7: PUBLISHING & DOCUMENTATION TOOLS
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [WARNING] Skipping critical module Quarto Publishing System due to previous critical failure
+[2025-09-15 14:49:45] [INFO] Executing: TinyTeX LaTeX Distribution...
+[2025-09-15 14:49:45] [ERROR] Failed: TinyTeX LaTeX Distribution - Module exited with code: 1
+[2025-09-15 14:49:45] [INFO] Executing: Pandoc Document Converter...
+[2025-09-15 14:49:45] [ERROR] Failed: Pandoc Document Converter - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-Pandoc.ps1
+[2025-09-15 14:49:45] [INFO] Executing: Quarto Extensions...
+[2025-09-15 14:49:45] [ERROR] Failed: Quarto Extensions - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-QuartoExtensions.ps1
+[2025-09-15 14:49:45] [INFO] Progress: Publishing Tools - 30/50 modules completed (60%)
+[2025-09-15 14:49:45] [INFO] 
+[2025-09-15 14:49:45] [INFO] ================================================================================
+[2025-09-15 14:49:45] [INFO]   PART 8: DATABASE & DATA MANAGEMENT TOOLS
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO] Skipping Database GUI Tools (DBeaver, etc.) (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping SQLite Database Tools (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Database Connectors & Drivers (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Progress: Database Tools - 33/50 modules completed (66%)
+[2025-09-15 14:49:46] [INFO] 
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO]   PART 9: BIG DATA & DISTRIBUTED COMPUTING
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO] Skipping Java Development Kit (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Apache Spark & Hadoop (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Spark Python/R Integration (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Cloud Platform Tools (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Progress: Big Data Stack - 37/50 modules completed (74%)
+[2025-09-15 14:49:46] [INFO] 
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO]   PART 10: SPECIALIZED TOOLS & UTILITIES
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO] Skipping Custom Fonts for Publications (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Media Processing Tools (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Graph Visualization Tools (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Skipping Docker Containerization (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Progress: Specialized Tools - 41/50 modules completed (82%)
+[2025-09-15 14:49:46] [INFO] 
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO]   PART 11: SYSTEM CONFIGURATION & OPTIMIZATION
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO] Executing: Environment Variables Configuration...
+[2025-09-15 14:49:46] [ERROR] Failed: Environment Variables Configuration - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-EnvironmentVariables.ps1
+[2025-09-15 14:49:46] [INFO] Executing: PATH Environment Optimization...
+[2025-09-15 14:49:46] [ERROR] Failed: PATH Environment Optimization - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-PathOptimization.ps1
+[2025-09-15 14:49:46] [INFO] Executing: PowerShell Profile Configuration...
+[2025-09-15 14:49:46] [ERROR] Failed: PowerShell Profile Configuration - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Configure-PowerShellProfile.ps1
+[2025-09-15 14:49:46] [INFO] Executing: Optional Windows Features...
+[2025-09-15 14:49:46] [ERROR] Failed: Optional Windows Features - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Install-WindowsFeatures.ps1
+[2025-09-15 14:49:46] [INFO] Progress: System Configuration - 45/50 modules completed (90%)
+[2025-09-15 14:49:46] [INFO] 
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO]   PART 12: FINAL VERIFICATION & TESTING
+[2025-09-15 14:49:46] [INFO] ================================================================================
+[2025-09-15 14:49:46] [INFO] Executing: Python Environment Verification...
+[2025-09-15 14:49:46] [ERROR] Failed: Python Environment Verification - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-PythonEnvironment.ps1
+[2025-09-15 14:49:46] [INFO] Skipping R Environment Verification (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [INFO] Executing: Quarto Publishing Verification...
+[2025-09-15 14:49:46] [ERROR] Failed: Quarto Publishing Verification - Module file not found: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\modules\Test-QuartoEnvironment.ps1
+[2025-09-15 14:49:46] [INFO] Skipping Database Connectivity Tests (not included in RecilienceScan profile)
+[2025-09-15 14:49:46] [WARNING] Skipping critical module Environment Status Report Generation due to previous critical failure
+[2025-09-15 14:49:46] [INFO] Progress: Final Verification - 50/50 modules completed (100%)
+[2025-09-15 14:49:46] [INFO] 
+[2025-09-15 14:49:47] [INFO] ================================================================================
+[2025-09-15 14:49:47] [INFO]   INSTALLATION SUMMARY
+[2025-09-15 14:49:47] [INFO] ================================================================================
+[2025-09-15 14:49:47] [INFO] Installation completed in 00:00:02
+[2025-09-15 14:49:47] [INFO] Modules executed: 17
+[2025-09-15 14:49:47] [SUCCESS] Modules succeeded: 6
+[2025-09-15 14:49:47] [ERROR] Modules failed: 11
+[2025-09-15 14:49:47] [INFO] Modules skipped: 32
+[2025-09-15 14:49:47] [INFO] 
+[2025-09-15 14:49:47] [INFO] DETAILED RESULTS BY COMPONENT:
+[2025-09-15 14:49:47] [INFO] AI_MLPackages: 0 success, 0 failed, 2 skipped (Total: 2)
+[2025-09-15 14:49:47] [INFO] BasicPackages: 0 success, 0 failed, 2 skipped (Total: 2)
+[2025-09-15 14:49:47] [INFO] BigDataStack: 0 success, 0 failed, 4 skipped (Total: 4)
+[2025-09-15 14:49:47] [INFO] CustomFonts: 0 success, 0 failed, 1 skipped (Total: 1)
+[2025-09-15 14:49:47] [INFO] DatabaseTools: 0 success, 0 failed, 4 skipped (Total: 4)
+[2025-09-15 14:49:47] [INFO] DataSciencePackages: 0 success, 0 failed, 3 skipped (Total: 3)
+[2025-09-15 14:49:47] [INFO] Git: 0 success, 1 failed, 0 skipped (Total: 1)
+[2025-09-15 14:49:47] [INFO] NLPPackages: 0 success, 0 failed, 1 skipped (Total: 1)
+[2025-09-15 14:49:47] [INFO] OptionalTools: 0 success, 0 failed, 3 skipped (Total: 3)
+[2025-09-15 14:49:47] [INFO] PackageManagers: 3 success, 0 failed, 0 skipped (Total: 3)
+[2025-09-15 14:49:47] [INFO] Prerequisites: 3 success, 5 failed, 1 skipped (Total: 9)
+[2025-09-15 14:49:47] [INFO] Python: 0 success, 1 failed, 1 skipped (Total: 2)
+[2025-09-15 14:49:47] [INFO] Quarto: 0 success, 4 failed, 1 skipped (Total: 5)
+[2025-09-15 14:49:47] [INFO] R: 0 success, 0 failed, 3 skipped (Total: 3)
+[2025-09-15 14:49:47] [INFO] RStudio: 0 success, 0 failed, 1 skipped (Total: 1)
+[2025-09-15 14:49:47] [INFO] Utilities: 0 success, 0 failed, 2 skipped (Total: 2)
+[2025-09-15 14:49:47] [INFO] VSCode: 0 success, 0 failed, 2 skipped (Total: 2)
+[2025-09-15 14:49:47] [INFO] WindowsTerminal: 0 success, 0 failed, 1 skipped (Total: 1)
+[2025-09-15 14:49:47] [ERROR] 
+[2025-09-15 14:49:47] [ERROR] Installation completed with significant issues
+[2025-09-15 14:49:47] [ERROR] Multiple components failed. Environment may not be fully functional.
+[2025-09-15 14:49:47] [INFO] 
+[2025-09-15 14:49:47] [INFO] Detailed installation log saved to: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\Installation-Report-20250915-144942.txt
+[2025-09-15 14:49:47] [INFO] To verify your installation, run: python verify_setup.py
+[2025-09-15 14:49:47] [INFO] Documentation: Check README.md for usage instructions
+[2025-09-15 14:49:47] [INFO] Machine-readable results saved to: C:\Users\Christiaan\Documents\GitHub\Data-ScienceKit\Scripts\Installation-Results-20250915-144947.json
