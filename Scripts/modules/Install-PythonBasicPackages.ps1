@@ -1,178 +1,165 @@
-# Script: modules/Install-PythonCore.ps1
-# Purpose: Automatically installs Python with silent installation parameters
+# Script: modules/Install-PythonBasicPackages.ps1
+# Purpose: Installs essential Python packages for data science and general development
 
-Write-Host "Starting automated Python installation..." -ForegroundColor Yellow
+Write-Host "Installing essential Python packages..." -ForegroundColor Yellow
 
-# Configuration
-$PythonVersion = "3.11.9"
-$PythonInstallerUrl = "https://www.python.org/ftp/python/$PythonVersion/python-$PythonVersion-amd64.exe"
-$InstallerFileName = "python-$PythonVersion-amd64.exe"
-$DownloadPath = Join-Path -Path $env:TEMP -ChildPath $InstallerFileName
-
-# Function to test if Python is installed and working
-function Test-PythonInstallation {
+# Function to test if Python is available
+function Test-PythonAvailable {
     try {
         $pythonVersion = python --version 2>&1
-        if ($pythonVersion -match "Python \d+\.\d+\.\d+") {
-            Write-Host "Found Python: $pythonVersion" -ForegroundColor Green
+        if ($pythonVersion -match "Python") {
             return $true
         }
     } catch {
-        # Python not found or not working
+        return $false
     }
     return $false
 }
 
-try {
-    # Check if Python is already installed
-    Write-Host "Checking for existing Python installation..." -ForegroundColor Cyan
-    
-    if (Test-PythonInstallation) {
-        Write-Host "Python is already installed and working." -ForegroundColor Green
-        
-        # Check pip as well
-        try {
-            $pipVersion = pip --version 2>&1
-            Write-Host "Found pip: $pipVersion" -ForegroundColor Green
-        } catch {
-            Write-Host "Python found but pip may need attention" -ForegroundColor Yellow
-        }
-        
-        exit 0  # Already installed
-    }
-    
-    Write-Host "Python not found. Proceeding with automated installation..." -ForegroundColor Yellow
-    
-    # Download Python installer
-    Write-Host "Downloading Python $PythonVersion installer..." -ForegroundColor Cyan
-    Write-Host "URL: $PythonInstallerUrl" -ForegroundColor Gray
-    
-    # Ensure TLS 1.2 for downloading
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
-    
-    Invoke-WebRequest -Uri $PythonInstallerUrl -OutFile $DownloadPath -ErrorAction Stop
-    Write-Host "Python installer downloaded successfully." -ForegroundColor Green
-    
-    # Verify download
-    if (-not (Test-Path $DownloadPath)) {
-        throw "Downloaded installer not found at $DownloadPath"
-    }
-    
-    $fileSize = (Get-Item $DownloadPath).Length / 1MB
-    Write-Host "Downloaded installer size: $([math]::Round($fileSize, 1)) MB" -ForegroundColor Gray
-    
-    # Run silent installation
-    Write-Host "Running automated Python installation..." -ForegroundColor Cyan
-    Write-Host "This may take several minutes. Please wait..." -ForegroundColor Yellow
-    
-    # Python installer silent installation parameters:
-    # /quiet = Silent installation (no UI)
-    # PrependPath=1 = Add Python to PATH (CRITICAL!)
-    # Include_test=0 = Don't install test suite (saves space)
-    # SimpleInstall=1 = Simple installation mode
-    # InstallAllUsers=0 = Install for current user only
-    # TargetDir = Custom installation directory (optional)
-    
-    $installArgs = @(
-        "/quiet"                    # Silent installation
-        "PrependPath=1"            # Add to PATH - CRITICAL!
-        "Include_test=0"           # Skip test suite
-        "SimpleInstall=1"          # Simple install
-        "InstallAllUsers=0"        # Current user only
+# Function to install packages with error handling
+function Install-PythonPackage {
+    param(
+        [string]$PackageName,
+        [string]$DisplayName = $PackageName
     )
     
-    Write-Host "Executing: $DownloadPath $($installArgs -join ' ')" -ForegroundColor Gray
+    try {
+        Write-Host "  Installing $DisplayName..." -ForegroundColor Cyan
+        python -m pip install $PackageName --quiet --no-warn-script-location
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "    + $DisplayName installed successfully" -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host "    - $DisplayName installation failed (exit code: $LASTEXITCODE)" -ForegroundColor Red
+            return $false
+        }
+    } catch {
+        Write-Host "    - $DisplayName installation error: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+try {
+    Write-Host "=== PYTHON BASIC PACKAGES INSTALLATION ===" -ForegroundColor Cyan
     
-    # Start the installation process
-    $process = Start-Process -FilePath $DownloadPath -ArgumentList $installArgs -Wait -PassThru -NoNewWindow
+    # Check if Python is available
+    if (-not (Test-PythonAvailable)) {
+        Write-Host "CRITICAL ERROR: Python is not available. Cannot install packages." -ForegroundColor Red
+        Write-Host "Please ensure Python is installed and in PATH." -ForegroundColor Yellow
+        Write-Host "Try running: python --version" -ForegroundColor Yellow
+        exit 1
+    }
     
-    $exitCode = $process.ExitCode
+    # Check if pip is available
+    if (-not (Test-PipAvailable)) {
+        Write-Host "CRITICAL ERROR: pip is not available. Cannot install packages." -ForegroundColor Red
+        Write-Host "Please ensure pip is installed with Python." -ForegroundColor Yellow
+        Write-Host "Try running: pip --version" -ForegroundColor Yellow
+        exit 1
+    }
     
-    if ($exitCode -eq 0) {
-        Write-Host "Python installation completed successfully!" -ForegroundColor Green
-    } else {
-        Write-Host "Python installation completed with exit code: $exitCode" -ForegroundColor Yellow
-        if ($exitCode -eq 1) {
-            Write-Host "Exit code 1 typically means installation completed but with warnings" -ForegroundColor Yellow
+    Write-Host "Both Python and pip are available. Proceeding..." -ForegroundColor Green
+    
+    # Upgrade pip first (in case it wasn't upgraded during Python installation)
+    Write-Host "Ensuring pip is up to date..." -ForegroundColor Cyan
+    try {
+        Write-Host "Executing: python -m pip install --upgrade pip" -ForegroundColor Gray
+        python -m pip install --upgrade pip
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "pip upgrade completed successfully" -ForegroundColor Green
+        } else {
+            Write-Host "pip upgrade completed with warnings (continuing anyway)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "pip upgrade failed, but continuing with current version..." -ForegroundColor Yellow
+    }
+    
+    # Define essential packages
+    $essentialPackages = @(
+        @{ Package = "pandas>=1.5.0"; Display = "pandas (Data manipulation)" },
+        @{ Package = "numpy>=1.23.0"; Display = "numpy (Numerical computing)" },
+        @{ Package = "matplotlib>=3.6.0"; Display = "matplotlib (Basic plotting)" },
+        @{ Package = "requests>=2.28.0"; Display = "requests (HTTP library)" },
+        @{ Package = "openpyxl>=3.0.0"; Display = "openpyxl (Excel files)" },
+        @{ Package = "python-dotenv>=0.20.0"; Display = "python-dotenv (Environment variables)" },
+        @{ Package = "tqdm>=4.64.0"; Display = "tqdm (Progress bars)" },
+        @{ Package = "jupyter>=1.0.0"; Display = "jupyter (Interactive notebooks)" },
+        @{ Package = "ipykernel>=6.0.0"; Display = "ipykernel (Jupyter kernel)" }
+    )
+    
+    # Track installation results
+    $successCount = 0
+    $failureCount = 0
+    $totalPackages = $essentialPackages.Count
+    
+    Write-Host "Installing $totalPackages essential packages..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    # Install each package
+    foreach ($pkg in $essentialPackages) {
+        if (Install-PythonPackage -PackageName $pkg.Package -DisplayName $pkg.Display) {
+            $successCount++
+        } else {
+            $failureCount++
         }
     }
     
-    # Clean up installer
-    try {
-        Remove-Item -Path $DownloadPath -Force -ErrorAction SilentlyContinue
-        Write-Host "Cleaned up installer file." -ForegroundColor Gray
-    } catch {
-        Write-Host "Could not clean up installer file (not critical)" -ForegroundColor Gray
-    }
+    # Summary
+    Write-Host ""
+    Write-Host ("=" * 60) -ForegroundColor Cyan
+    Write-Host "PYTHON BASIC PACKAGES INSTALLATION SUMMARY" -ForegroundColor Cyan
+    Write-Host ("=" * 60) -ForegroundColor Cyan
     
-    # Refresh environment variables to pick up new PATH
-    Write-Host "Refreshing environment variables..." -ForegroundColor Cyan
+    Write-Host "Total packages: $totalPackages" -ForegroundColor Gray
+    Write-Host "Successfully installed: $successCount" -ForegroundColor Green
+    Write-Host "Failed: $failureCount" -ForegroundColor $(if ($failureCount -gt 0) { "Red" } else { "Gray" })
     
-    # Update PATH for current session
-    $systemPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
-    $userPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)
+    # Test key packages
+    Write-Host ""
+    Write-Host "Testing key package imports..." -ForegroundColor Cyan
     
-    if ($userPath) {
-        $env:PATH = "$systemPath;$userPath"
-    } else {
-        $env:PATH = $systemPath
-    }
+    $testPackages = @("pandas", "numpy", "matplotlib", "requests")
+    $importSuccesses = 0
     
-    # Wait a moment for installation to fully complete
-    Start-Sleep -Seconds 3
-    
-    # Verify installation
-    Write-Host "Verifying Python installation..." -ForegroundColor Cyan
-    
-    if (Test-PythonInstallation) {
-        Write-Host "Python installation verified successfully!" -ForegroundColor Green
-        
-        # Upgrade pip to latest version
-        Write-Host "Upgrading pip to latest version..." -ForegroundColor Cyan
+    foreach ($testPkg in $testPackages) {
         try {
-            python.exe -m pip install --upgrade pip --quiet
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "pip upgraded successfully" -ForegroundColor Green
+            $importTest = python -c "import $testPkg; print('$testPkg OK')" 2>$null
+            if ($importTest -like "*OK*") {
+                Write-Host "  + $testPkg imports successfully" -ForegroundColor Green
+                $importSuccesses++
             } else {
-                Write-Host "pip upgrade completed with warnings" -ForegroundColor Yellow
+                Write-Host "  - $testPkg import failed" -ForegroundColor Red
             }
         } catch {
-            Write-Host "pip upgrade failed, but continuing..." -ForegroundColor Yellow
+            Write-Host "  - $testPkg import test error" -ForegroundColor Red
         }
-        
-        # Test pip
-        try {
-            $pipVersion = pip --version 2>&1
-            Write-Host "pip is working: $pipVersion" -ForegroundColor Green
-        } catch {
-            Write-Host "Python installed but pip may need attention" -ForegroundColor Yellow
-        }
-        
-        # Show installation details
-        try {
-            Write-Host "Python installation details:" -ForegroundColor Cyan
-            python -c "import sys; print(f'  Python version: {sys.version}'); print(f'  Executable: {sys.executable}'); print(f'  Platform: {sys.platform}')"
-        } catch {
-            Write-Host "  Could not retrieve detailed Python information" -ForegroundColor Yellow
-        }
-        
-        exit 0  # Success
+    }
+    
+    # Final status
+    if ($successCount -eq $totalPackages -and $importSuccesses -eq $testPackages.Count) {
+        Write-Host ""
+        Write-Host "All essential Python packages installed and working!" -ForegroundColor Green
+        exit 0
+    } elseif ($successCount -gt ($totalPackages * 0.8)) {
+        Write-Host ""
+        Write-Host "Most essential packages installed successfully." -ForegroundColor Yellow
+        Write-Host "Some packages failed but core functionality should work." -ForegroundColor Yellow
+        exit 0
     } else {
-        Write-Host "WARNING: Python installation completed but verification failed." -ForegroundColor Yellow
-        Write-Host "Python may not be immediately available in current session." -ForegroundColor Yellow
-        Write-Host "Try opening a new PowerShell/CMD window, or restart your terminal." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Multiple package installations failed." -ForegroundColor Red
+        Write-Host "Python environment may not be fully functional." -ForegroundColor Red
         
-        # Don't fail the installation - it might work in a new session
+        # Don't fail completely - some packages might still work
         exit 0
     }
     
 } catch {
-    Write-Host "ERROR: Python installation failed." -ForegroundColor Red
+    Write-Host "ERROR: Unexpected error during Python package installation." -ForegroundColor Red
     Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Fallback options:" -ForegroundColor Yellow
-    Write-Host "1. Try installing Python manually from https://www.python.org/downloads/" -ForegroundColor Yellow
-    Write-Host "2. Use Windows Store Python: 'ms-windows-store://pdp/?productid=9NRWMJP3717K'" -ForegroundColor Yellow
-    Write-Host "3. Use Chocolatey: 'choco install python'" -ForegroundColor Yellow
+    Write-Host "You can try installing packages manually:" -ForegroundColor Yellow
+    Write-Host "pip install pandas numpy matplotlib requests openpyxl jupyter" -ForegroundColor Cyan
     exit 1
 }
