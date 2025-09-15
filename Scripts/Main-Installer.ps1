@@ -333,6 +333,7 @@ Show-ProgressSummary -Phase "System Prerequisites" -Current 4 -Total 50
 Write-Section "PART 2: PACKAGE MANAGERS & SYSTEM TOOLS"
 Invoke-ModuleWithErrorHandling -ModuleName "Install-Chocolatey.ps1" -Description "Chocolatey Package Manager" -Component "PackageManagers" -Critical
 Invoke-ModuleWithErrorHandling -ModuleName "Install-Scoop.ps1" -Description "Scoop Package Manager" -Component "PackageManagers"
+Invoke-ModuleWithErrorHandling -ModuleName "Install-Winget.ps1" -Description "Winget Package Manager" -Component "PackageManagers"
 Invoke-ModuleWithErrorHandling -ModuleName "Test-WingetAvailability.ps1" -Description "Windows Package Manager Verification" -Component "PackageManagers"
 # Invoke-ModuleWithErrorHandling -ModuleName "Refresh-PathAndEnvironment.ps1" -Description "Environment Variables Refresh" -Component "PackageManagers" -Critical
 
