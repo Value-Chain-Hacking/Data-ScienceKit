@@ -1,4 +1,5 @@
-
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine -Force
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
 # Comprehensive Data Science & Research Pipeline Installer
 
@@ -239,4 +240,5 @@ This table outlines software, packages, and tools considered for an automated re
 |                                   | `devtools` (R)                      |  [x]  | Tools for R package development (useful for GitHub installs)        | `Install-RPackages.ps1`                                 |
 |                                   | `summarytools` (R)                  |  [x]  | Quick and comprehensive summary statistics in R                       | `Install-RPackages.ps1`                                 |
 |                                   | `janitor` (R)                       |  [x]  | Simple data cleaning functions for R                                  | `Install-RPackages.ps1`                                 |
+
 |                                   | `skimr` (R)                         |  [x]  | Compact and flexible summaries of data in R                           | `Install-RPackages.ps1`                                 |
