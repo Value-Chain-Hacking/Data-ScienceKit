@@ -47,10 +47,20 @@ function Install-RPackage {
 
 try {
     # Check if R is available
+    Write-Host "Checking for R installation..." -ForegroundColor Cyan
+    
     if (-not (Test-RAvailable)) {
-        Write-Host "ERROR: R is not available. Cannot install packages." -ForegroundColor Red
-        Write-Host "Please ensure R is installed and in PATH." -ForegroundColor Yellow
-        exit 1
+        Write-Host "R not found in current PATH. Refreshing environment..." -ForegroundColor Yellow
+        Update-SessionPath
+        Start-Sleep -Seconds 2
+        
+        if (-not (Test-RAvailable)) {
+            Write-Host "R is still not available after PATH refresh." -ForegroundColor Red
+            Write-Host "This may happen if R was just installed in the same session." -ForegroundColor Yellow
+            Write-Host "R packages installation will be skipped for now." -ForegroundColor Yellow
+            Write-Host "You can install R packages manually later or restart your terminal." -ForegroundColor Yellow
+            exit 0  # Don't fail the installation
+        }
     }
     
     Write-Host "R is available. Proceeding with package installation..." -ForegroundColor Green
