@@ -28,9 +28,20 @@ function Update-SessionPath {
 }
 
 # Function to test if R is available
+# Instead of: R --version
+# Use: & "C:\Program Files\R\R-4.4.2\bin\x64\R.exe" --version
+# Or: Rscript --version
+
 function Test-RAvailable {
     try {
-        $rVersion = R --version 2>&1
+        # Try Rscript first (no alias conflicts)
+        $rVersion = Rscript --version 2>&1
+        if ($rVersion -match "R scripting front-end version") {
+            return $true
+        }
+        
+        # Fallback to full path
+        $rVersion = & "C:\Program Files\R\R-4.4.2\bin\x64\R.exe" --version 2>&1
         if ($rVersion -match "R version") {
             return $true
         }
