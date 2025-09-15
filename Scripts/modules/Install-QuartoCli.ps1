@@ -3,11 +3,32 @@
 
 Write-Host "Starting automated Quarto CLI installation..." -ForegroundColor Yellow
 
-# Configuration
-$QuartoVersion = "1.8.24"  # Update as needed
-$QuartoMsiUrl = "https://github.com/quarto-dev/quarto-cli/releases/download/v$QuartoVersion/quarto-$QuartoVersion-win.msi"
-$InstallerFileName = "quarto-$QuartoVersion-win.msi"
-$DownloadPath = Join-Path -Path $env:TEMP -ChildPath $InstallerFileName
+# Function to get latest Quarto version info from GitHub API
+function Get-LatestQuartoVersion {
+    try {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+        $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest" -ErrorAction Stop
+        $version = $latestRelease.tag_name -replace '^v', ''
+        $installerAsset = $latestRelease.assets | Where-Object { $_.name -like "*win.msi" } | Select-Object -First 1
+        
+        if ($installerAsset) {
+            return @{
+                Version = $version
+                DownloadUrl = $installerAsset.browser_download_url
+                FileName = $installerAsset.name
+            }
+        }
+    } catch {
+        Write-Host "Could not fetch latest release info, using fallback version" -ForegroundColor Yellow
+    }
+    
+    # Fallback to known working version
+    return @{
+        Version = "1.5.57"
+        DownloadUrl = "https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.57/quarto-1.5.57-win.msi"
+        FileName = "quarto-1.5.57-win.msi"
+    }
+}
 
 # Function to refresh PATH environment variable
 function Update-SessionPath {
@@ -24,7 +45,7 @@ function Update-SessionPath {
 function Test-QuartoInstallation {
     try {
         $quartoVersion = quarto --version 2>&1
-        if ($quartoVersion -match "\d+\.\d+\.\d+") {
+        if ($quartoVersion -match "\d+\.\d+\.\d+" -and $quartoVersion -notlike "*not recognized*") {
             Write-Host "Found Quarto: $quartoVersion" -ForegroundColor Green
             return $true
         }
@@ -44,34 +65,6 @@ function Test-ChocolateyAvailable {
     }
 }
 
-# Function to clean Chocolatey cache and locks
-function Clear-ChocolateyLocks {
-    Write-Host "Clearing Chocolatey cache and lock files..." -ForegroundColor Cyan
-    
-    try {
-        # Remove specific lock files for Quarto
-        $lockFiles = @(
-            "C:\ProgramData\chocolatey\lib\quarto*",
-            "C:\ProgramData\chocolatey\lib\ee6bce875b9b8971dd4aa65ea780cfa34a6f2e1e",
-            "C:\ProgramData\chocolatey\lib-bad"
-        )
-        
-        foreach ($lockFile in $lockFiles) {
-            if (Test-Path $lockFile) {
-                Remove-Item $lockFile -Recurse -Force -ErrorAction SilentlyContinue
-                Write-Host "  Removed: $lockFile" -ForegroundColor Gray
-            }
-        }
-        
-        # Clear Chocolatey cache
-        choco cache clear --force 2>&1 | Out-Null
-        Write-Host "  Chocolatey cache cleared" -ForegroundColor Gray
-        
-    } catch {
-        Write-Host "  Could not clear all lock files (continuing anyway)" -ForegroundColor Yellow
-    }
-}
-
 try {
     # Check if Quarto is already installed
     Write-Host "Checking for existing Quarto installation..." -ForegroundColor Cyan
@@ -83,7 +76,7 @@ try {
     
     Write-Host "Quarto not found. Proceeding with installation..." -ForegroundColor Yellow
     
-    # Method 1: Try Chocolatey with lock file cleanup
+    # Method 1: Try Chocolatey (simplified approach)
     Write-Host "Attempting installation via Chocolatey..." -ForegroundColor Cyan
     
     # Refresh PATH first in case Chocolatey was just installed
@@ -92,7 +85,6 @@ try {
     if (Test-ChocolateyAvailable) {
         Write-Host "Chocolatey is available. Installing Quarto via Chocolatey..." -ForegroundColor Green
         
-        # First attempt - direct install
         try {
             Write-Host "Executing: choco install quarto --yes --force" -ForegroundColor Gray
             
@@ -103,7 +95,7 @@ try {
                 
                 # Refresh PATH and test
                 Update-SessionPath
-                Start-Sleep -Seconds 3
+                Start-Sleep -Seconds 5
                 
                 if (Test-QuartoInstallation) {
                     Write-Host "Quarto installation verified via Chocolatey!" -ForegroundColor Green
@@ -113,71 +105,35 @@ try {
                 }
             } else {
                 Write-Host "Chocolatey installation failed with exit code: $($chocoProcess.ExitCode)" -ForegroundColor Yellow
-                throw "Chocolatey failed, trying cleanup approach"
             }
         } catch {
-            Write-Host "First Chocolatey attempt failed: $($_.Exception.Message)" -ForegroundColor Yellow
-            
-            # Second attempt - clear locks and retry
-            Write-Host "Attempting Chocolatey installation with cache cleanup..." -ForegroundColor Cyan
-            Clear-ChocolateyLocks
-            
-            try {
-                Start-Sleep -Seconds 2  # Let filesystem settle
-                $chocoProcess2 = Start-Process -FilePath "choco" -ArgumentList @("install", "quarto", "--yes", "--force", "--ignore-checksums") -Wait -PassThru -NoNewWindow
-                
-                if ($chocoProcess2.ExitCode -eq 0) {
-                    Write-Host "Chocolatey Quarto installation completed after cleanup!" -ForegroundColor Green
-                    Update-SessionPath
-                    Start-Sleep -Seconds 3
-                    
-                    if (Test-QuartoInstallation) {
-                        Write-Host "Quarto installation verified via Chocolatey after cleanup!" -ForegroundColor Green
-                        exit 0
-                    }
-                } else {
-                    throw "Chocolatey still failing after cleanup, trying direct download"
-                }
-            } catch {
-                Write-Host "Chocolatey cleanup approach also failed: $($_.Exception.Message)" -ForegroundColor Yellow
-                Write-Host "Falling back to direct installation method..." -ForegroundColor Yellow
-            }
+            Write-Host "Chocolatey installation failed: $($_.Exception.Message)" -ForegroundColor Yellow
         }
+        
+        Write-Host "Chocolatey installation unsuccessful, proceeding to direct download..." -ForegroundColor Yellow
     } else {
         Write-Host "Chocolatey not available. Using direct installation method..." -ForegroundColor Yellow
     }
     
     # Method 2: Direct download and installation from GitHub releases
-    Write-Host "Downloading Quarto installer from GitHub releases..." -ForegroundColor Cyan
-    Write-Host "URL: $QuartoMsiUrl" -ForegroundColor Gray
+    Write-Host "Getting latest Quarto version information..." -ForegroundColor Cyan
+    $quartoInfo = Get-LatestQuartoVersion
+    $DownloadPath = Join-Path -Path $env:TEMP -ChildPath $quartoInfo.FileName
+    
+    Write-Host "Downloading Quarto installer: $($quartoInfo.FileName)" -ForegroundColor Cyan
+    Write-Host "URL: $($quartoInfo.DownloadUrl)" -ForegroundColor Gray
     
     # Ensure TLS 1.2 for downloading
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
     
     try {
-        Invoke-WebRequest -Uri $QuartoMsiUrl -OutFile $DownloadPath -ErrorAction Stop
+        Invoke-WebRequest -Uri $quartoInfo.DownloadUrl -OutFile $DownloadPath -ErrorAction Stop
         Write-Host "Quarto installer downloaded successfully." -ForegroundColor Green
     } catch {
-        Write-Host "Failed to download from direct URL. Trying latest release..." -ForegroundColor Yellow
-        
-        # Fallback: Try to get latest release URL from GitHub API
-        try {
-            $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest"
-            $installerAsset = $latestRelease.assets | Where-Object { $_.name -like "*win.msi" } | Select-Object -First 1
-            
-            if ($installerAsset) {
-                Write-Host "Found latest release: $($installerAsset.name)" -ForegroundColor Green
-                $DownloadPath = Join-Path -Path $env:TEMP -ChildPath $installerAsset.name
-                Invoke-WebRequest -Uri $installerAsset.browser_download_url -OutFile $DownloadPath -ErrorAction Stop
-                Write-Host "Latest Quarto installer downloaded successfully." -ForegroundColor Green
-            } else {
-                throw "Could not find suitable Quarto installer in latest release"
-            }
-        } catch {
-            Write-Host "Could not download Quarto installer automatically." -ForegroundColor Red
-            Write-Host "Please manually install Quarto from: https://quarto.org/docs/get-started/" -ForegroundColor Yellow
-            exit 1
-        }
+        Write-Host "Failed to download Quarto installer." -ForegroundColor Red
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Please manually install Quarto from: https://quarto.org/docs/get-started/" -ForegroundColor Yellow
+        exit 1
     }
     
     # Verify download
@@ -195,10 +151,10 @@ try {
     
     # MSI silent installation parameters
     $msiArgs = @(
-        "/i", $DownloadPath,        # Install the MSI
-        "/quiet",                   # Silent installation
-        "/norestart",               # Don't restart system
-        "/l*v", "$env:TEMP\QuartoInstall.log"  # Log installation
+        "/i", "`"$DownloadPath`"",        # Install the MSI (quoted for spaces)
+        "/quiet",                         # Silent installation
+        "/norestart",                     # Don't restart system
+        "/l*v", "`"$env:TEMP\QuartoInstall.log`""  # Log installation
     )
     
     Write-Host "Executing: msiexec $($msiArgs -join ' ')" -ForegroundColor Gray
@@ -214,6 +170,12 @@ try {
         Write-Host "Quarto installation completed (restart recommended)" -ForegroundColor Yellow
     } else {
         Write-Host "Quarto installation completed with exit code: $exitCode" -ForegroundColor Yellow
+        
+        # Check installation log for details
+        $logPath = "$env:TEMP\QuartoInstall.log"
+        if (Test-Path $logPath) {
+            Write-Host "Installation log available at: $logPath" -ForegroundColor Gray
+        }
     }
     
     # Clean up installer
@@ -317,7 +279,7 @@ try {
     Write-Host ""
     Write-Host "Fallback options:" -ForegroundColor Yellow
     Write-Host "1. Download Quarto manually: https://quarto.org/docs/get-started/" -ForegroundColor Yellow
-    Write-Host "2. Use different package manager: winget install quarto" -ForegroundColor Yellow
+    Write-Host "2. Use different package manager: winget install Posit.Quarto" -ForegroundColor Yellow
     Write-Host "3. Try Chocolatey in a new session after restart" -ForegroundColor Yellow
     exit 1
 }
