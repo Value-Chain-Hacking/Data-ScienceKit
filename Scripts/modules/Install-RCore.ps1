@@ -105,7 +105,49 @@ try {
             if ($chocoProcess.ExitCode -eq 0) {
                 Write-Host "Chocolatey R installation completed successfully!" -ForegroundColor Green
                 
-                # Refresh PATH and test
+                # Manual PATH fix for R installation
+                Write-Host "Adding R to system PATH..." -ForegroundColor Cyan
+                try {
+                    # Common R installation paths
+                    $rPaths = @(
+                        "C:\Program Files\R\R-4.4.2\bin\x64",
+                        "C:\Program Files\R\R-4.4.2\bin",
+                        "C:\Program Files (x86)\R\R-4.4.2\bin\x64",
+                        "C:\Program Files (x86)\R\R-4.4.2\bin"
+                    )
+                    
+                    $rBinPath = $null
+                    foreach ($path in $rPaths) {
+                        if (Test-Path $path) {
+                            $rBinPath = $path
+                            Write-Host "Found R installation at: $path" -ForegroundColor Gray
+                            break
+                        }
+                    }
+                    
+                    if ($rBinPath) {
+                        # Add to machine PATH
+                        $currentPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+                        if ($currentPath -notlike "*$rBinPath*") {
+                            $newPath = "$currentPath;$rBinPath"
+                            [Environment]::SetEnvironmentVariable("PATH", $newPath, [EnvironmentVariableTarget]::Machine)
+                            Write-Host "R added to system PATH: $rBinPath" -ForegroundColor Green
+                        } else {
+                            Write-Host "R already in system PATH" -ForegroundColor Gray
+                        }
+                        
+                        # Add to current session PATH
+                        $env:PATH = "$env:PATH;$rBinPath"
+                        Write-Host "R added to current session PATH" -ForegroundColor Gray
+                        
+                    } else {
+                        Write-Host "Could not find R binary directory" -ForegroundColor Yellow
+                    }
+                } catch {
+                    Write-Host "Could not automatically fix R PATH: $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+                
+                # Refresh PATH and test with multiple attempts
                 Update-SessionPath
                 Start-Sleep -Seconds 3
                 
@@ -114,7 +156,7 @@ try {
                     exit 0
                 } else {
                     Write-Host "Chocolatey installation completed but R not immediately available" -ForegroundColor Yellow
-                    Write-Host "This is common with R installations - continuing with verification..." -ForegroundColor Yellow
+                    Write-Host "This is common with R installations - continuing with direct verification..." -ForegroundColor Yellow
                 }
             } else {
                 Write-Host "Chocolatey installation failed with exit code: $($chocoProcess.ExitCode)" -ForegroundColor Yellow

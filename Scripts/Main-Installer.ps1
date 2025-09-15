@@ -421,11 +421,16 @@ Invoke-ModuleWithErrorHandling -ModuleName "Install-WindowsFeatures.ps1" -Descri
 Show-ProgressSummary -Phase "System Configuration" -Current 45 -Total 50
 
 # PART 12: Final Verification & Testing
+
 Write-Section "PART 12: FINAL VERIFICATION & TESTING"
 Invoke-ModuleWithErrorHandling -ModuleName "Test-PythonEnvironment.ps1" -Description "Python Environment Verification" -Component "Python"
 Invoke-ModuleWithErrorHandling -ModuleName "Test-REnvironment.ps1" -Description "R Environment Verification" -Component "R"
 Invoke-ModuleWithErrorHandling -ModuleName "Test-QuartoEnvironment.ps1" -Description "Quarto Publishing Verification" -Component "Quarto"
 Invoke-ModuleWithErrorHandling -ModuleName "Test-DatabaseConnections.ps1" -Description "Database Connectivity Tests" -Component "DatabaseTools"
+
+# ADD THIS LINE FOR RECILIENCESCAN PROFILE
+Invoke-ModuleWithErrorHandling -ModuleName "Install-RecilienceScan.ps1" -Description "RecilienceScan Project Setup & SystemTest" -Component "Prerequisites"
+
 Invoke-ModuleWithErrorHandling -ModuleName "Generate-EnvironmentReport.ps1" -Description "Environment Status Report Generation" -Component "Prerequisites" -Critical
 
 Show-ProgressSummary -Phase "Final Verification" -Current 50 -Total 50
