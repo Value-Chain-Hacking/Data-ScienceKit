@@ -71,7 +71,7 @@ $Global:ProfileDefinitions = @{
     }
     "RecilienceScan" = @{
         Description = "Minimal setup for RecilienceScan report automation pipeline"
-        Components = @("Prerequisites", "PackageManagers",  "Git", "Python", "Quarto")
+        Components = @("Prerequisites", "PackageManagers", "BasicPackages", "VSCode", "R",  "Git", "Python", "Quarto")
     }
     "Minimal" = @{
         Description = "Document authoring with Python/R basics and Quarto"
