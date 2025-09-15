@@ -3,6 +3,30 @@
 
 Write-Host "Installing essential R packages..." -ForegroundColor Yellow
 
+# Function to refresh PATH environment variable
+function Update-SessionPath {
+    $systemPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+    $userPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)
+    
+    if ($userPath) {
+        $env:PATH = "$systemPath;$userPath"
+    } else {
+        $env:PATH = $systemPath
+    }
+}
+
+# Function to refresh PATH environment variable
+function Update-SessionPath {
+    $systemPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+    $userPath = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User)
+    
+    if ($userPath) {
+        $env:PATH = "$systemPath;$userPath"
+    } else {
+        $env:PATH = $systemPath
+    }
+}
+
 # Function to test if R is available
 function Test-RAvailable {
     try {

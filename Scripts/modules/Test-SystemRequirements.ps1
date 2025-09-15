@@ -169,8 +169,8 @@ if ($allRequirementsMet) {
     
     Write-Host ""
     Write-Host "Errors that must be resolved:" -ForegroundColor Red
-    foreach ($error in $errors) {
-        Write-Host "  X $error" -ForegroundColor Red
+    foreach ($errorMsg in $errors) {
+        Write-Host "  X $errorMsg" -ForegroundColor Red
     }
     
     if ($warnings.Count -gt 0) {
