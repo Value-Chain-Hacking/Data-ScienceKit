@@ -150,7 +150,10 @@ try {
         @{ Package = "six"; Display = "six (Python 2/3 Compatibility)" },
         @{ Package = "python-dateutil"; Display = "dateutil (Date/Time Utilities)" },
         @{ Package = "pytz"; Display = "pytz (Timezone Support)" },
-        @{ Package = "packaging"; Display = "packaging (Core Packaging Utilities)" }
+        @{ Package = "packaging"; Display = "packaging (Core Packaging Utilities)" },
+        @{ Package = "lxml"; Display = "lxml (XML/HTML Parsing)" },
+        @{ Package = "PyYAML"; Display = "PyYAML (YAML Files)" },
+        @{ Package = "pillow"; Display = "pillow (Image Processing)" }
     )
     
     # Additional useful packages
@@ -160,7 +163,14 @@ try {
         @{ Package = "matplotlib"; Display = "matplotlib (Plotting)" },
         @{ Package = "openpyxl"; Display = "openpyxl (Excel Files)" },
         @{ Package = "jupyter"; Display = "jupyter (Interactive Notebooks)" },
-        @{ Package = "ipython"; Display = "ipython (Enhanced Python Shell)" }
+        @{ Package = "ipython"; Display = "ipython (Enhanced Python Shell)" },
+        @{ Package = "scipy"; Display = "scipy (Scientific Computing)" },
+        @{ Package = "seaborn"; Display = "seaborn (Statistical Plotting)" },
+        @{ Package = "scikit-learn"; Display = "scikit-learn (Machine Learning)" },
+        @{ Package = "plotly"; Display = "plotly (Interactive Plots)" },
+        @{ Package = "tqdm"; Display = "tqdm (Progress Bars)" },
+        @{ Package = "pytest"; Display = "pytest (Testing Framework)" },
+        @{ Package = "virtualenv"; Display = "virtualenv (Virtual Environments)" }
     )
     
     # Track installation results
