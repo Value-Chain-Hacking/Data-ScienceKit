@@ -168,6 +168,7 @@ try {
         @{ Package = "scipy"; Display = "scipy (Scientific Computing)" },
         @{ Package = "seaborn"; Display = "seaborn (Statistical Plotting)" },
         @{ Package = "scikit-learn"; Display = "scikit-learn (Machine Learning)" },
+        @{ Package = "matplotlib"; Display = "matplotlib (Plotting)" },
         @{ Package = "plotly"; Display = "plotly (Interactive Plots)" },
         @{ Package = "tqdm"; Display = "tqdm (Progress Bars)" },
         @{ Package = "pytest"; Display = "pytest (Testing Framework)" },
