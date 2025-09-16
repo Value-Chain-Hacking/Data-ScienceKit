@@ -153,7 +153,8 @@ try {
         @{ Package = "packaging"; Display = "packaging (Core Packaging Utilities)" },
         @{ Package = "lxml"; Display = "lxml (XML/HTML Parsing)" },
         @{ Package = "PyYAML"; Display = "PyYAML (YAML Files)" },
-        @{ Package = "pillow"; Display = "pillow (Image Processing)" }
+        @{ Package = "pillow"; Display = "pillow (Image Processing)" },
+        @{ Package = "pywin32"; Display = "pywin32 (Windows COM Interface - may need post-install)" }
     )
     
     # Additional useful packages

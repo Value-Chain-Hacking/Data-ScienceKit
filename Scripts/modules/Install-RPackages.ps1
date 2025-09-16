@@ -16,85 +16,210 @@ function Update-SessionPath {
 }
 
 # Function to test if R is available (Windows-specific)
-function Test-RAvailable {
-    try {
-        # Try R.exe first (avoids PowerShell alias conflicts)
-        $rVersion = R.exe --version 2>&1
-        if ($rVersion -match "R version") {
-            return $true
-        }
-    } catch {
-        # Try Rscript as fallback
-        try {
-            $rscriptVersion = Rscript.exe --version 2>&1
-            if ($rscriptVersion -match "R scripting front-end version") {
-                return $true
-            }
-        } catch {
-            return $false
-        }
-    }
-    return $false
-}
-
-# Function to install R packages with proper Windows syntax and error handling
+# Robust R Package Installer with Multiple Methods
 function Install-RPackage {
     param(
         [string]$PackageName,
         [string]$DisplayName = $PackageName
     )
     
+    Write-Host "  Installing $DisplayName..." -ForegroundColor Cyan
+    
+    # Method 1: cmd /c bypass (most reliable for parameter issues)
     try {
-        Write-Host "  Installing $DisplayName..." -ForegroundColor Cyan
-        
-        # Use R.exe with proper Windows syntax - don't hide errors
+        Write-Host "    Trying method 1 (cmd bypass)..." -ForegroundColor Gray
         $installCommand = "if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }"
         
-        $result = R.exe --slave -e $installCommand 2>&1
+        $result = cmd /c "R.exe --slave -e `"$installCommand`"" 2>&1
         
         if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
-            # Verify the package actually loads
-            $verifyResult = R.exe --slave -e "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+            $verifyResult = cmd /c "R.exe --slave -e `"cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))`"" 2>$null
             if ($verifyResult -eq "OK") {
-                Write-Host "    + $DisplayName installed and verified" -ForegroundColor Green
+                Write-Host "    + $DisplayName installed and verified (method 1)" -ForegroundColor Green
                 return $true
-            } else {
-                Write-Host "    - $DisplayName installation succeeded but package won't load" -ForegroundColor Red
-                return $false
             }
-        } else {
-            Write-Host "    - $DisplayName installation failed" -ForegroundColor Red
-            if ($result -and $result -notlike "*ALREADY_PRESENT*") {
-                Write-Host "      Error: $result" -ForegroundColor Gray
-            }
-            return $false
         }
     } catch {
-        Write-Host "    - $DisplayName installation error: $($_.Exception.Message)" -ForegroundColor Red
-        return $false
+        Write-Host "    - Method 1 failed: $($_.Exception.Message)" -ForegroundColor Gray
     }
+    
+    # Method 2: Start-Process with explicit arguments
+    try {
+        Write-Host "    Trying method 2 (Start-Process)..." -ForegroundColor Gray
+        $installCommand = "if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }"
+        
+        $tempOut = [System.IO.Path]::GetTempFileName()
+        $process = Start-Process "R.exe" -ArgumentList @("--slave", "-e", $installCommand) -Wait -PassThru -RedirectStandardOutput $tempOut -NoNewWindow -WindowStyle Hidden
+        
+        if ($process.ExitCode -eq 0) {
+            $result = Get-Content $tempOut -Raw
+            Remove-Item $tempOut -Force -ErrorAction SilentlyContinue
+            
+            if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+                # Verify installation
+                $verifyTemp = [System.IO.Path]::GetTempFileName()
+                $verifyProcess = Start-Process "R.exe" -ArgumentList @("--slave", "-e", "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))") -Wait -PassThru -RedirectStandardOutput $verifyTemp -NoNewWindow -WindowStyle Hidden
+                $verifyResult = Get-Content $verifyTemp -Raw
+                Remove-Item $verifyTemp -Force -ErrorAction SilentlyContinue
+                
+                if ($verifyResult -eq "OK") {
+                    Write-Host "    + $DisplayName installed and verified (method 2)" -ForegroundColor Green
+                    return $true
+                }
+            }
+        }
+        Remove-Item $tempOut -Force -ErrorAction SilentlyContinue
+    } catch {
+        Write-Host "    - Method 2 failed: $($_.Exception.Message)" -ForegroundColor Gray
+    }
+    
+    # Method 3: & operator with explicit parameter separation
+    try {
+        Write-Host "    Trying method 3 (& operator)..." -ForegroundColor Gray
+        $installCommand = "if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }"
+        
+        $result = & R.exe --slave --no-restore --no-save -e $installCommand 2>&1
+        
+        if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+            $verifyResult = & R.exe --slave --no-restore --no-save -e "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+            if ($verifyResult -eq "OK") {
+                Write-Host "    + $DisplayName installed and verified (method 3)" -ForegroundColor Green
+                return $true
+            }
+        }
+    } catch {
+        Write-Host "    - Method 3 failed: $($_.Exception.Message)" -ForegroundColor Gray
+    }
+    
+    # Method 4: Rscript alternative (different executable)
+    try {
+        Write-Host "    Trying method 4 (Rscript)..." -ForegroundColor Gray
+        $installCommand = "if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }"
+        
+        $result = Rscript.exe -e $installCommand 2>&1
+        
+        if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+            $verifyResult = Rscript.exe -e "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+            if ($verifyResult -eq "OK") {
+                Write-Host "    + $DisplayName installed and verified (method 4)" -ForegroundColor Green
+                return $true
+            }
+        }
+    } catch {
+        Write-Host "    - Method 4 failed: $($_.Exception.Message)" -ForegroundColor Gray
+    }
+    
+    # Method 5: Temp file approach (most isolated)
+    try {
+        Write-Host "    Trying method 5 (temp file)..." -ForegroundColor Gray
+        
+        $tempScript = [System.IO.Path]::GetTempFileName() + ".R"
+        $installScript = @"
+if (!require('$PackageName', quietly=TRUE)) {
+  install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE)
+  cat('INSTALLED')
+} else {
+  cat('ALREADY_PRESENT')
+}
+"@
+        
+        Set-Content -Path $tempScript -Value $installScript
+        
+        $result = R.exe --slave --no-restore --no-save -f $tempScript 2>&1
+        Remove-Item $tempScript -Force -ErrorAction SilentlyContinue
+        
+        if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+            # Verify with temp script
+            $verifyScript = [System.IO.Path]::GetTempFileName() + ".R"
+            Set-Content -Path $verifyScript -Value "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))"
+            
+            $verifyResult = R.exe --slave --no-restore --no-save -f $verifyScript 2>$null
+            Remove-Item $verifyScript -Force -ErrorAction SilentlyContinue
+            
+            if ($verifyResult -eq "OK") {
+                Write-Host "    + $DisplayName installed and verified (method 5)" -ForegroundColor Green
+                return $true
+            }
+        }
+    } catch {
+        Write-Host "    - Method 5 failed: $($_.Exception.Message)" -ForegroundColor Gray
+    }
+    
+    # Method 6: PowerShell Invoke-Expression (last resort)
+    try {
+        Write-Host "    Trying method 6 (Invoke-Expression)..." -ForegroundColor Gray
+        
+        $installCommand = "R.exe --slave -e `"if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }`""
+        
+        $result = Invoke-Expression $installCommand 2>&1
+        
+        if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+            $verifyCommand = "R.exe --slave -e `"cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))`""
+            $verifyResult = Invoke-Expression $verifyCommand 2>$null
+            
+            if ($verifyResult -eq "OK") {
+                Write-Host "    + $DisplayName installed and verified (method 6)" -ForegroundColor Green
+                return $true
+            }
+        }
+    } catch {
+        Write-Host "    - Method 6 failed: $($_.Exception.Message)" -ForegroundColor Gray
+    }
+    
+    # All methods failed
+    Write-Host "    - $DisplayName installation failed (all methods exhausted)" -ForegroundColor Red
+    Write-Host "      Try manual installation: install.packages('$PackageName')" -ForegroundColor Yellow
+    return $false
 }
 
-try {
-    # Check if R is available
-    Write-Host "Checking for R installation..." -ForegroundColor Cyan
-    
-    if (-not (Test-RAvailable)) {
-        Write-Host "R not found in current PATH. Refreshing environment..." -ForegroundColor Yellow
-        Update-SessionPath
-        Start-Sleep -Seconds 2
-        
-        if (-not (Test-RAvailable)) {
-            Write-Host "R is still not available after PATH refresh." -ForegroundColor Red
-            Write-Host "This may happen if R was just installed in the same session." -ForegroundColor Yellow
-            Write-Host "R packages installation will be skipped for now." -ForegroundColor Yellow
-            Write-Host "You can install R packages manually later or restart your terminal." -ForegroundColor Yellow
-            exit 0  # Don't fail the installation
+# Enhanced R availability test with multiple methods
+function Test-RAvailable {
+    # Method 1: Direct R.exe test
+    try {
+        $rVersion = R.exe --version 2>&1
+        if ($rVersion -match "R version") {
+            return $true
         }
+    } catch {}
+    
+    # Method 2: Rscript test
+    try {
+        $rscriptVersion = Rscript.exe --version 2>&1
+        if ($rscriptVersion -match "R scripting front-end version") {
+            return $true
+        }
+    } catch {}
+    
+    # Method 3: cmd bypass test
+    try {
+        $result = cmd /c "R.exe --version" 2>&1
+        if ($result -match "R version") {
+            return $true
+        }
+    } catch {}
+    
+    return $false
+}
+
+# Test function to verify R package installation works
+function Test-RPackageInstallation {
+    Write-Host "Testing R package installation methods..." -ForegroundColor Cyan
+    
+    # Test with a simple, fast-installing package
+    $testPackage = "jsonlite"  # Small, common package
+    
+    Write-Host "Running installation test with package: $testPackage" -ForegroundColor Yellow
+    $success = Install-RPackage -PackageName $testPackage -DisplayName "$testPackage (test package)"
+    
+    if ($success) {
+        Write-Host "✓ R package installation is working!" -ForegroundColor Green
+        return $true
+    } else {
+        Write-Host "✗ R package installation failed completely" -ForegroundColor Red
+        Write-Host "Manual troubleshooting required" -ForegroundColor Yellow
+        return $false
     }
-    
-    Write-Host "R is available. Proceeding with package installation..." -ForegroundColor Green
-    
+
     # Get R version info using proper Windows syntax
     try {
         $rVersionInfo = R.exe --slave -e "cat(R.version.string)" 2>$null

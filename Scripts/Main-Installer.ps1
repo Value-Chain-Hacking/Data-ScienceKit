@@ -334,7 +334,13 @@ Write-Section "PART 2: PACKAGE MANAGERS & SYSTEM TOOLS"
 Invoke-ModuleWithErrorHandling -ModuleName "Install-Chocolatey.ps1" -Description "Chocolatey Package Manager" -Component "PackageManagers" -Critical
 Invoke-ModuleWithErrorHandling -ModuleName "Install-Scoop.ps1" -Description "Scoop Package Manager" -Component "PackageManagers"
 Invoke-ModuleWithErrorHandling -ModuleName "Install-Winget.ps1" -Description "Winget Package Manager" -Component "PackageManagers"
+Invoke-ModuleWithErrorHandling -ModuleName "Install-Corda.ps1" -Description "Corda Package" -Component "PackageManagers"
+Invoke-ModuleWithErrorHandling -ModuleName "Install-PortableApps.ps1" -Description "Windows Package Manager Verification" -Component "PackageManagers"
+Invoke-ModuleWithErrorHandling -ModuleName "Install-PortableApps.ps1" -Description "Windows Package Manager Verification" -Component "PackageManagers"
+Invoke-ModuleWithErrorHandling -ModuleName "Install-GitHubCLI.ps1" -Description "Windows Package Manager Verification" -Component "PackageManagers"
+
 Invoke-ModuleWithErrorHandling -ModuleName "Test-WingetAvailability.ps1" -Description "Windows Package Manager Verification" -Component "PackageManagers"
+
 # Invoke-ModuleWithErrorHandling -ModuleName "Refresh-PathAndEnvironment.ps1" -Description "Environment Variables Refresh" -Component "PackageManagers" -Critical
 
 Show-ProgressSummary -Phase "Package Managers" -Current 8 -Total 50

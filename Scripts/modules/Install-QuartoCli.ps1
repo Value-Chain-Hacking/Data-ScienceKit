@@ -1,5 +1,6 @@
 # modules/Install-QuartoCLI.ps1
-# Install Quarto CLI (module-safe: no 'exit', sets $LASTEXITCODE, uses Write-Log if available)
+# Comprehensive Quarto CLI installer with all available methods
+# (module-safe: no 'exit', sets $LASTEXITCODE, uses Write-Log if available)
 
 $ErrorActionPreference = 'Stop'
 $LASTEXITCODE = 1
@@ -7,7 +8,7 @@ $moduleLog = $null
 
 # --- Logger shim (use Main-Installer Write-Log if available) -----------------
 function _log {
-    param([string]$Message,[string]$Level = "INFO")
+    param([string]$Message, [ValidateSet('INFO','SUCCESS','WARNING','ERROR')]$Level = 'INFO')
     if (Get-Command -Name Write-Log -ErrorAction SilentlyContinue) {
         Write-Log -Message $Message -Level $Level
     } else {
@@ -16,56 +17,34 @@ function _log {
     }
 }
 
-# --- Small helpers -----------------------------------------------------------
+# --- Helper Functions --------------------------------------------------------
 function Update-SessionPath {
     $systemPath = [Environment]::GetEnvironmentVariable("PATH", 'Machine')
-    $userPath   = [Environment]::GetEnvironmentVariable("PATH", 'User')
+    $userPath = [Environment]::GetEnvironmentVariable("PATH", 'User')
+    
+    # Combine existing paths
     $candidates = @($systemPath, $userPath) -join ';'
-    $common = @(
+    
+    # Add common Quarto installation paths
+    $commonPaths = @(
         "$env:ProgramFiles\Quarto\bin",
         "$env:LOCALAPPDATA\Programs\Quarto\bin",
         "$env:USERPROFILE\scoop\apps\quarto\current\bin",
-        "C:\ProgramData\chocolatey\lib\quarto\tools\quarto\bin"
-    ) | Where-Object { Test-Path $_ }
-    $env:PATH = @($candidates; $common) -join ';'
+        "C:\ProgramData\chocolatey\lib\quarto\tools\quarto\bin",
+        "$env:USERPROFILE\miniconda3\Scripts",
+        "$env:USERPROFILE\anaconda3\Scripts"
+    ) | Where-Object { Test-Path $_ -ErrorAction SilentlyContinue }
+    
+    $env:PATH = @($candidates; $commonPaths) -join ';'
 }
-
-function Update-SessionPath {
-  $mach = [Environment]::GetEnvironmentVariable('PATH','Machine')
-  $user = [Environment]::GetEnvironmentVariable('PATH','User')
-  $env:PATH = @($mach,$user) -join ';'
-  foreach ($p in @("$env:ProgramFiles\Quarto\bin", "$env:LOCALAPPDATA\Programs\Quarto\bin")) {
-    if (Test-Path $p) { $env:PATH = "$env:PATH;$p" }
-  }
-}
-
-function Test-QuartoWorking {
-  try {
-    Update-SessionPath
-    $out = (& quarto --version) 2>$null
-    if ($LASTEXITCODE -eq 0 -and $out -match '\d+\.\d+(\.\d+)?') {
-      return ,@($true, ($out -split '\r?\n')[0].Trim())
-    }
-  } catch {}
-  return ,@($false, $null)
-}
-
-function _log([string]$Message,[ValidateSet('INFO','SUCCESS','WARNING','ERROR')]$Level='INFO'){
-  if (Get-Command Write-Log -ErrorAction SilentlyContinue) { Write-Log -Message $Message -Level $Level }
-  else {
-    $c = switch ($Level) {'SUCCESS'{'Green'}'WARNING'{'Yellow'}'ERROR'{'Red'} default{'Gray'}}
-    Write-Host "[$Level] $Message" -ForegroundColor $c
-  }
-}
-
 
 function Test-QuartoWorking {
     try {
         Update-SessionPath
-        $v = (& quarto --version) 2>$null
-        if ($LASTEXITCODE -eq 0 -and $v -match '\d+\.\d+(\.\d+)?') {
-            _log "Found working Quarto: $v" "SUCCESS"
-            return ,@($true, $v)
+        $version = (& quarto --version) 2>$null
+        if ($LASTEXITCODE -eq 0 -and $version -match '\d+\.\d+(\.\d+)?') {
+            $cleanVersion = ($version -split '\r?\n')[0].Trim()
+            return ,@($true, $cleanVersion)
         }
     } catch {}
     return ,@($false, $null)
@@ -90,201 +69,359 @@ function Start-ModuleTranscript {
     } catch {}
 }
 
-function Stop-ModuleTranscript { try { Stop-Transcript | Out-Null } catch {} }
-
-# --- Install methods ---------------------------------------------------------
-function Install-QuartoViaScoop {
-    _log "Method 1: Scoop (GitHub Actions pattern)..." "INFO"
-    $ok = $false; $method = $null
-    With-PolicyBypass {
-        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-            _log "Installing Scoop..." "INFO"
-            Invoke-RestMethod -UseBasicParsing get.scoop.sh | Invoke-Expression
-            Update-SessionPath
-            Start-Sleep 2
-        }
-        if (Get-Command scoop -ErrorAction SilentlyContinue) {
-            scoop bucket add main 2>$null | Out-Null
-            scoop update | Out-Null
-            _log "Installing Quarto via Scoop..." "INFO"
-            scoop install quarto | Out-Null
-            $ok,$ver = Test-QuartoWorking
-            if ($ok) { $method = "Scoop"; return ,@($ok,$method,$ver) }
-        }
-    }
-    return ,@($false,$null,$null)
+function Stop-ModuleTranscript { 
+    try { Stop-Transcript | Out-Null } catch {} 
 }
 
-function Repair-ChocolateyQuarto {
-    _log "Fixing known Chocolatey Quarto issues..." "INFO"
+function Get-Architecture {
+    if ([Environment]::Is64BitOperatingSystem) {
+        if ((Get-CimInstance Win32_Processor).Name -match 'ARM') { return 'arm64' }
+        else { return 'x64' }
+    } else { 
+        return 'x86' 
+    }
+}
+
+# --- Installation Methods ---------------------------------------------------
+
+function Install-QuartoViaWinget {
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { 
+        return ,@($false, $null, $null) 
+    }
+    
+    _log "Method 1: Winget (recommended)..." "INFO"
+    try {
+        winget source update 2>$null | Out-Null
+        
+        $isElevated = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+        $args = @('install', '--id', 'Posit.Quarto', '-e', '--accept-package-agreements', '--accept-source-agreements', '--silent')
+        if ($isElevated) { $args += @('--scope', 'machine') }
+        
+        $process = Start-Process winget -ArgumentList $args -WindowStyle Hidden -Wait -PassThru
+        if ($process.ExitCode -eq 0) {
+            Start-Sleep 3
+            $ok, $ver = Test-QuartoWorking
+            if ($ok) { return ,@($true, "Winget", $ver) }
+            _log "Winget reported success, but Quarto not on PATH yet (may need shell restart)" "WARNING"
+        } else {
+            _log "Winget returned exit code $($process.ExitCode)" "WARNING"
+        }
+    } catch { 
+        _log "Winget installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
+}
+
+function Install-QuartoViaScoop {
+    _log "Method 2: Scoop (developer-friendly)..." "INFO"
+    $ok = $false
+    
+    With-PolicyBypass {
+        # Install Scoop if not present
+        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            _log "Installing Scoop first..." "INFO"
+            try {
+                Invoke-RestMethod -UseBasicParsing get.scoop.sh | Invoke-Expression
+                Update-SessionPath
+                Start-Sleep 2
+            } catch {
+                _log "Failed to install Scoop: $($_.Exception.Message)" "WARNING"
+                return ,@($false, $null, $null)
+            }
+        }
+        
+        if (Get-Command scoop -ErrorAction SilentlyContinue) {
+            try {
+                scoop bucket add main 2>$null | Out-Null
+                scoop update 2>$null | Out-Null
+                _log "Installing Quarto via Scoop..." "INFO"
+                scoop install quarto 2>$null | Out-Null
+                
+                $ok, $ver = Test-QuartoWorking
+                if ($ok) { return ,@($true, "Scoop", $ver) }
+            } catch {
+                _log "Scoop installation failed: $($_.Exception.Message)" "WARNING"
+            }
+        }
+    }
+    return ,@($false, $null, $null)
+}
+
+function Install-QuartoViaConda {
+    if (-not (Get-Command conda -ErrorAction SilentlyContinue)) { 
+        # Try mamba as fallback
+        if (-not (Get-Command mamba -ErrorAction SilentlyContinue)) {
+            return ,@($false, $null, $null)
+        }
+        $condaCmd = "mamba"
+    } else {
+        $condaCmd = "conda"
+    }
+    
+    _log "Method 3: $condaCmd (data science environments)..." "INFO"
+    try {
+        _log "Installing Quarto via $condaCmd..." "INFO"
+        $process = Start-Process $condaCmd -ArgumentList @('install', '-c', 'conda-forge', 'quarto', '--yes', '--quiet') -WindowStyle Hidden -Wait -PassThru
+        
+        if ($process.ExitCode -eq 0) {
+            Start-Sleep 2
+            Update-SessionPath
+            $ok, $ver = Test-QuartoWorking
+            if ($ok) { return ,@($true, "Conda/$condaCmd", $ver) }
+        } else {
+            _log "$condaCmd returned exit code $($process.ExitCode)" "WARNING"
+        }
+    } catch { 
+        _log "$condaCmd installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
+}
+
+function Install-QuartoViaChocolatey {
+    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) { 
+        return ,@($false, $null, $null) 
+    }
+    
+    _log "Method 4: Chocolatey (enterprise-friendly)..." "INFO"
+    
+    # Clean up known Chocolatey Quarto issues
     try {
         Get-Process | Where-Object {$_.ProcessName -like "*choco*"} | Stop-Process -Force -ErrorAction SilentlyContinue
-        $paths = @(
+        $problemPaths = @(
             "C:\ProgramData\chocolatey\lib\ee6bce875b9b8971dd4aa65ea780cfa34a6f2e1e",
             "C:\ProgramData\chocolatey\lib\quarto*",
             "C:\ProgramData\chocolatey\lib-bad"
         )
-        foreach ($p in $paths) { Get-ChildItem $p -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue }
+        foreach ($path in $problemPaths) { 
+            Get-ChildItem $path -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 
+        }
         choco cache clear --force 2>&1 | Out-Null
-        _log "Chocolatey cache cleaned" "INFO"
     } catch {}
-}
-
-function Install-QuartoViaWinget {
-    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { return ,@($false,$null,$null) }
-    _log "Method 2: Winget..." "INFO"
+    
     try {
-        winget source update 2>$null | Out-Null
-        winget install Posit.Quarto --silent --accept-package-agreements --accept-source-agreements
-        $ok,$ver = Test-QuartoWorking
-        if ($ok) { return ,@($true,"Winget",$ver) }
-    } catch { _log "Winget installation failed: $($_.Exception.Message)" "WARNING" }
-    return ,@($false,$null,$null)
+        _log "Installing Quarto via Chocolatey..." "INFO"
+        choco install quarto --yes --force --no-progress 2>$null | Out-Null
+        
+        $ok, $ver = Test-QuartoWorking
+        if ($ok) { return ,@($true, "Chocolatey", $ver) }
+    } catch { 
+        _log "Chocolatey installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
 }
 
-function Install-QuartoViaChocolatey {
-    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) { return ,@($false,$null,$null) }
-    _log "Method 3: Chocolatey..." "INFO"
-    Repair-ChocolateyQuarto
+function Install-QuartoViaGitHubAPI {
+    _log "Method 5: GitHub API (latest release)..." "INFO"
     try {
-        choco install quarto --yes --force --no-progress
-        $ok,$ver = Test-QuartoWorking
-        if ($ok) { return ,@($true,"Chocolatey",$ver) }
-    } catch { _log "Chocolatey installation failed: $($_.Exception.Message)" "WARNING" }
-    return ,@($false,$null,$null)
-}
-
-function Install-QuartoViaWinget {
-  if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { return ,@($false,$null) }
-  _log "Fallback: Installing Quarto via WinGet..." 'INFO'
-  try {
-    winget source update 2>$null | Out-Null
-    $isElevated = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
-                  ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-    $args = @('install','--id','Posit.Quarto','-e','--accept-package-agreements','--accept-source-agreements')
-    if ($isElevated) { $args += @('--scope','machine') }
-
-    $p = Start-Process winget -ArgumentList $args -WindowStyle Hidden -Wait -PassThru
-    if ($p.ExitCode -eq 0) {
-      Start-Sleep 2
-      $ok,$ver = Test-QuartoWorking
-      if ($ok) { return ,@($true,$ver) }
-      _log "WinGet reported success, but Quarto not on PATH yet (new shell may be required)." 'WARNING'
-    } else {
-      _log "WinGet returned exit code $($p.ExitCode)." 'WARNING'
-    }
-  } catch { _log "WinGet install error: $($_.Exception.Message)" 'WARNING' }
-  return ,@($false,$null)
-}
-
-function Install-QuartoViaMSI {
-  _log "Fallback: Installing Quarto via official MSI..." 'INFO'
-  $arch = if ([Environment]::Is64BitOperatingSystem) {
-    if ((Get-CimInstance Win32_Processor).Name -match 'ARM') {'arm64'} else {'x64'}
-  } else {'x86'} # (Quarto is x64/arm64)
-
-  $base = 'https://quarto.org/download/latest'
-  $msiUrl = if ($arch -eq 'arm64') { "$base/quarto-win-arm64.msi" } else { "$base/quarto-win.msi" }
-
-  $dlDir = Join-Path $env:TEMP 'quarto-install'
-  if (!(Test-Path $dlDir)) { New-Item -ItemType Directory -Path $dlDir | Out-Null }
-  $msiPath = Join-Path $dlDir ("quarto-latest-{0}.msi" -f $arch)
-
-  try {
-    if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
-      Start-BitsTransfer -Source $msiUrl -Destination $msiPath -RetryInterval 2 -ErrorAction Stop
-    } else {
-      Invoke-WebRequest -Uri $msiUrl -OutFile $msiPath -UseBasicParsing -ErrorAction Stop
-    }
-    $proc = Start-Process msiexec.exe -ArgumentList @('/i',"`"$msiPath`"","/qn","/norestart","ALLUSERS=1") -Wait -PassThru
-    if ($proc.ExitCode -eq 0) {
-      Start-Sleep 2
-      $ok,$ver = Test-QuartoWorking
-      if ($ok) { return ,@($true,$ver) }
-      _log "MSI exit 0 but Quarto not on PATH yet (new shell may be required)." 'WARNING'
-    } else {
-      _log "MSI returned exit code $($proc.ExitCode)." 'WARNING'
-    }
-  } catch { _log "MSI install error: $($_.Exception.Message)" 'WARNING' }
-  return ,@($false,$null)
-}
-
-function Install-QuartoViaMSI {
-    _log "Method 4: Official MSI (silent)..." "INFO"
-    # x64 vs ARM64
-    $arch = if ([Environment]::Is64BitOperatingSystem) {
-        if ((Get-CimInstance Win32_Processor).Name -match 'ARM') {'arm64'} else {'x64'}
-    } else {'x86'}
-    $base = "https://quarto.org/download/latest"
-    $msi  = if ($arch -eq 'arm64') { "$base/quarto-win-arm64.msi" } else { "$base/quarto-win.msi" }
-    $dir  = Join-Path $env:TEMP "quarto-install"
-    if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
-    $path = Join-Path $dir ("quarto-latest-{0}.msi" -f $arch)
-    try {
+        $api = "https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest"
+        $release = Invoke-RestMethod -Uri $api -UseBasicParsing
+        
+        $arch = Get-Architecture
+        $assetPattern = if ($arch -eq 'arm64') { "*win*arm64.msi" } else { "*win*.msi" }
+        $asset = $release.assets | Where-Object { $_.name -like $assetPattern } | Select-Object -First 1
+        
+        if (-not $asset) {
+            _log "No suitable MSI found for architecture $arch" "WARNING"
+            return ,@($false, $null, $null)
+        }
+        
+        $msiPath = Join-Path $env:TEMP $asset.name
+        _log "Downloading $($asset.name)..." "INFO"
+        
         if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
-            Start-BitsTransfer -Source $msi -Destination $path -RetryInterval 2 -ErrorAction Stop
+            Start-BitsTransfer -Source $asset.browser_download_url -Destination $msiPath -ErrorAction Stop
         } else {
-            Invoke-WebRequest -Uri $msi -OutFile $path -UseBasicParsing -ErrorAction Stop
+            Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $msiPath -UseBasicParsing -ErrorAction Stop
         }
-        $args = "/i `"$path`" /qn /norestart ALLUSERS=1"
-        $p = Start-Process msiexec.exe -ArgumentList $args -Wait -PassThru
-        if ($p.ExitCode -eq 0) {
-            $ok,$ver = Test-QuartoWorking
-            if ($ok) { return ,@($true,"MSI",$ver) }
-            _log "MSI exit code 0 but Quarto not found on PATH yet (PATH refresh may be pending)" "WARNING"
+        
+        $process = Start-Process msiexec.exe -ArgumentList @('/i', "`"$msiPath`"", '/qn', '/norestart', 'ALLUSERS=1') -Wait -PassThru
+        if ($process.ExitCode -eq 0) {
+            Start-Sleep 3
+            $ok, $ver = Test-QuartoWorking
+            if ($ok) { return ,@($true, "GitHub API", $ver) }
+            _log "MSI installation succeeded but Quarto not on PATH yet" "WARNING"
         } else {
-            _log "MSI install returned exit code $($p.ExitCode)" "WARNING"
+            _log "MSI installation returned exit code $($process.ExitCode)" "WARNING"
         }
-    } catch { _log "MSI installation failed: $($_.Exception.Message)" "WARNING" }
-    return ,@($false,$null,$null)
+    } catch { 
+        _log "GitHub API installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
 }
 
-# --- Main (module-safe) ------------------------------------------------------
+function Install-QuartoViaPortable {
+    _log "Method 6: Portable ZIP (no admin required)..." "INFO"
+    
+    $portableDir = "$env:LOCALAPPDATA\Programs\Quarto"
+    $zipPath = Join-Path $env:TEMP "quarto-portable.zip"
+    
+    try {
+        # Try to get the latest portable release
+        $zipUrl = "https://github.com/quarto-dev/quarto-cli/releases/latest/download/quarto-win.zip"
+        
+        _log "Downloading portable Quarto..." "INFO"
+        if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+            Start-BitsTransfer -Source $zipUrl -Destination $zipPath -ErrorAction Stop
+        } else {
+            Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing -ErrorAction Stop
+        }
+        
+        # Remove existing installation if present
+        if (Test-Path $portableDir) {
+            Remove-Item -Path $portableDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        
+        _log "Extracting portable Quarto..." "INFO"
+        Expand-Archive -Path $zipPath -DestinationPath $portableDir -Force
+        
+        # Update PATH to include portable installation
+        Update-SessionPath
+        $ok, $ver = Test-QuartoWorking
+        if ($ok) { return ,@($true, "Portable", $ver) }
+        
+    } catch { 
+        _log "Portable installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
+}
+
+function Install-QuartoViaMSI {
+    _log "Method 7: Official MSI (fallback)..." "INFO"
+    
+    $arch = Get-Architecture
+    $base = "https://quarto.org/download/latest"
+    $msiUrl = if ($arch -eq 'arm64') { "$base/quarto-win-arm64.msi" } else { "$base/quarto-win.msi" }
+    
+    $downloadDir = Join-Path $env:TEMP "quarto-install"
+    if (!(Test-Path $downloadDir)) { New-Item -ItemType Directory -Path $downloadDir | Out-Null }
+    $msiPath = Join-Path $downloadDir ("quarto-latest-{0}.msi" -f $arch)
+    
+    try {
+        _log "Downloading official MSI for $arch..." "INFO"
+        if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+            Start-BitsTransfer -Source $msiUrl -Destination $msiPath -RetryInterval 2 -ErrorAction Stop
+        } else {
+            Invoke-WebRequest -Uri $msiUrl -OutFile $msiPath -UseBasicParsing -ErrorAction Stop
+        }
+        
+        $process = Start-Process msiexec.exe -ArgumentList @('/i', "`"$msiPath`"", '/qn', '/norestart', 'ALLUSERS=1') -Wait -PassThru
+        if ($process.ExitCode -eq 0) {
+            Start-Sleep 3
+            $ok, $ver = Test-QuartoWorking
+            if ($ok) { return ,@($true, "MSI", $ver) }
+            _log "MSI installation succeeded but Quarto not on PATH yet (may need shell restart)" "WARNING"
+        } else {
+            _log "MSI installation returned exit code $($process.ExitCode)" "WARNING"
+        }
+    } catch { 
+        _log "MSI installation failed: $($_.Exception.Message)" "WARNING" 
+    }
+    return ,@($false, $null, $null)
+}
+
+# --- Main Installation Logic ------------------------------------------------
 Start-ModuleTranscript
+
 try {
-    _log "Checking for existing Quarto..." "INFO"
-    $ok,$ver = Test-QuartoWorking
+    _log "=== Quarto CLI Comprehensive Installation ===" "INFO"
+    _log "Architecture: $(Get-Architecture)" "INFO"
+    
+    # Check for existing installation
+    _log "Checking for existing Quarto installation..." "INFO"
+    $ok, $ver = Test-QuartoWorking
     if ($ok -and -not $Global:ForceReinstallFlag) {
-        _log "Quarto already installed ($ver). Skipping (use -ForceReinstall to override)." "SUCCESS"
+        _log "Quarto already installed and working: $ver" "SUCCESS"
+        _log "Use -ForceReinstall flag to override existing installation" "INFO"
         $Global:QuartoInstall = [pscustomobject]@{ Success=$true; Method="Existing"; Version=$ver; Log=$moduleLog }
         $LASTEXITCODE = 0
         return
     }
-
+    
     if ($Global:ForceReinstallFlag) {
-        _log "ForceReinstall requested — proceeding to reinstall Quarto." "WARNING"
+        _log "ForceReinstall flag detected - proceeding with fresh installation" "WARNING"
     }
-
-    foreach ($fn in @('Install-QuartoViaScoop','Install-QuartoViaWinget','Install-QuartoViaChocolatey','Install-QuartoViaMSI')) {
+    
+    # Try all installation methods in order of preference
+    $installMethods = @(
+        'Install-QuartoViaWinget',        # Most reliable for general users
+        'Install-QuartoViaScoop',         # Great for developers
+        'Install-QuartoViaConda',         # Important for data science users
+        'Install-QuartoViaChocolatey',    # Good for enterprise
+        'Install-QuartoViaGitHubAPI',     # More reliable than hardcoded URLs
+        'Install-QuartoViaPortable',      # No admin rights needed
+        'Install-QuartoViaMSI'            # Last resort fallback
+    )
+    
+    foreach ($method in $installMethods) {
         try {
-            $res = & $fn
-            $success,$method,$version = $res
+            _log "Attempting installation method: $method" "INFO"
+            $result = & $method
+            $success, $methodName, $version = $result
+            
             if ($success) {
-                _log "Quarto installed successfully via $method ($version)" "SUCCESS"
-                $Global:QuartoInstall = [pscustomobject]@{ Success=$true; Method=$method; Version=$version; Log=$moduleLog }
-                $LASTEXITCODE = 0
-                return
+                _log "SUCCESS: Quarto installed via $methodName" "SUCCESS"
+                _log "Version: $version" "SUCCESS"
+                
+                # Verify installation works
+                $verifyOk, $verifyVer = Test-QuartoWorking
+                if ($verifyOk) {
+                    $Global:QuartoInstall = [pscustomobject]@{ 
+                        Success = $true
+                        Method = $methodName
+                        Version = $verifyVer
+                        Log = $moduleLog 
+                    }
+                    $LASTEXITCODE = 0
+                    return
+                } else {
+                    _log "WARNING: Installation reported success but verification failed" "WARNING"
+                }
             } else {
-                _log "$fn did not succeed; trying next method..." "INFO"
+                _log "$method did not succeed, trying next method..." "INFO"
             }
         } catch {
-            _log "$fn threw: $($_.Exception.Message)" "WARNING"
+            _log "ERROR in $method : $($_.Exception.Message)" "WARNING"
         }
     }
-
-    _log "All automated methods failed. Manual fallback: https://quarto.org/docs/get-started/" "ERROR"
-    $Global:QuartoInstall = [pscustomobject]@{ Success=$false; Method=$null; Version=$null; Log=$moduleLog }
+    
+    # All methods failed
+    _log "All automated installation methods failed" "ERROR"
+    _log "Manual installation required:" "ERROR"
+    _log "1. Visit: https://quarto.org/docs/get-started/" "ERROR"
+    _log "2. Download and run the installer for your system" "ERROR"
+    _log "3. Restart your PowerShell session after installation" "ERROR"
+    
+    $Global:QuartoInstall = [pscustomobject]@{ 
+        Success = $false
+        Method = $null
+        Version = $null
+        Log = $moduleLog 
+    }
     $LASTEXITCODE = 1
-    return
-
+    
 } catch {
-    _log "Unexpected error: $($_.Exception.Message)" "ERROR"
-    $Global:QuartoInstall = [pscustomobject]@{ Success=$false; Method="Exception"; Version=$null; Log=$moduleLog }
+    _log "Unexpected error during Quarto installation: $($_.Exception.Message)" "ERROR"
+    $Global:QuartoInstall = [pscustomobject]@{ 
+        Success = $false
+        Method = "Exception"
+        Version = $null
+        Log = $moduleLog 
+    }
     $LASTEXITCODE = 1
-    return
+    
 } finally {
     Stop-ModuleTranscript
-    if ($moduleLog) { _log "Module log: $moduleLog" "INFO" }
+    if ($moduleLog) { 
+        _log "Installation log saved to: $moduleLog" "INFO" 
+    }
+    
+    # Final status report
+    if ($Global:QuartoInstall.Success) {
+        _log "=== INSTALLATION SUCCESSFUL ===" "SUCCESS"
+        _log "Method: $($Global:QuartoInstall.Method)" "SUCCESS"  
+        _log "Version: $($Global:QuartoInstall.Version)" "SUCCESS"
+    } else {
+        _log "=== INSTALLATION FAILED ===" "ERROR"
+        _log "All automated methods were unsuccessful" "ERROR"
+    }
 }
-
