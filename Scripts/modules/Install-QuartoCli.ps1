@@ -30,6 +30,35 @@ function Update-SessionPath {
     $env:PATH = @($candidates; $common) -join ';'
 }
 
+function Update-SessionPath {
+  $mach = [Environment]::GetEnvironmentVariable('PATH','Machine')
+  $user = [Environment]::GetEnvironmentVariable('PATH','User')
+  $env:PATH = @($mach,$user) -join ';'
+  foreach ($p in @("$env:ProgramFiles\Quarto\bin", "$env:LOCALAPPDATA\Programs\Quarto\bin")) {
+    if (Test-Path $p) { $env:PATH = "$env:PATH;$p" }
+  }
+}
+
+function Test-QuartoWorking {
+  try {
+    Update-SessionPath
+    $out = (& quarto --version) 2>$null
+    if ($LASTEXITCODE -eq 0 -and $out -match '\d+\.\d+(\.\d+)?') {
+      return ,@($true, ($out -split '\r?\n')[0].Trim())
+    }
+  } catch {}
+  return ,@($false, $null)
+}
+
+function _log([string]$Message,[ValidateSet('INFO','SUCCESS','WARNING','ERROR')]$Level='INFO'){
+  if (Get-Command Write-Log -ErrorAction SilentlyContinue) { Write-Log -Message $Message -Level $Level }
+  else {
+    $c = switch ($Level) {'SUCCESS'{'Green'}'WARNING'{'Yellow'}'ERROR'{'Red'} default{'Gray'}}
+    Write-Host "[$Level] $Message" -ForegroundColor $c
+  }
+}
+
+
 function Test-QuartoWorking {
     try {
         Update-SessionPath
@@ -125,6 +154,62 @@ function Install-QuartoViaChocolatey {
     return ,@($false,$null,$null)
 }
 
+function Install-QuartoViaWinget {
+  if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { return ,@($false,$null) }
+  _log "Fallback: Installing Quarto via WinGet..." 'INFO'
+  try {
+    winget source update 2>$null | Out-Null
+    $isElevated = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
+                  ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    $args = @('install','--id','Posit.Quarto','-e','--accept-package-agreements','--accept-source-agreements')
+    if ($isElevated) { $args += @('--scope','machine') }
+
+    $p = Start-Process winget -ArgumentList $args -WindowStyle Hidden -Wait -PassThru
+    if ($p.ExitCode -eq 0) {
+      Start-Sleep 2
+      $ok,$ver = Test-QuartoWorking
+      if ($ok) { return ,@($true,$ver) }
+      _log "WinGet reported success, but Quarto not on PATH yet (new shell may be required)." 'WARNING'
+    } else {
+      _log "WinGet returned exit code $($p.ExitCode)." 'WARNING'
+    }
+  } catch { _log "WinGet install error: $($_.Exception.Message)" 'WARNING' }
+  return ,@($false,$null)
+}
+
+function Install-QuartoViaMSI {
+  _log "Fallback: Installing Quarto via official MSI..." 'INFO'
+  $arch = if ([Environment]::Is64BitOperatingSystem) {
+    if ((Get-CimInstance Win32_Processor).Name -match 'ARM') {'arm64'} else {'x64'}
+  } else {'x86'} # (Quarto is x64/arm64)
+
+  $base = 'https://quarto.org/download/latest'
+  $msiUrl = if ($arch -eq 'arm64') { "$base/quarto-win-arm64.msi" } else { "$base/quarto-win.msi" }
+
+  $dlDir = Join-Path $env:TEMP 'quarto-install'
+  if (!(Test-Path $dlDir)) { New-Item -ItemType Directory -Path $dlDir | Out-Null }
+  $msiPath = Join-Path $dlDir ("quarto-latest-{0}.msi" -f $arch)
+
+  try {
+    if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+      Start-BitsTransfer -Source $msiUrl -Destination $msiPath -RetryInterval 2 -ErrorAction Stop
+    } else {
+      Invoke-WebRequest -Uri $msiUrl -OutFile $msiPath -UseBasicParsing -ErrorAction Stop
+    }
+    $proc = Start-Process msiexec.exe -ArgumentList @('/i',"`"$msiPath`"","/qn","/norestart","ALLUSERS=1") -Wait -PassThru
+    if ($proc.ExitCode -eq 0) {
+      Start-Sleep 2
+      $ok,$ver = Test-QuartoWorking
+      if ($ok) { return ,@($true,$ver) }
+      _log "MSI exit 0 but Quarto not on PATH yet (new shell may be required)." 'WARNING'
+    } else {
+      _log "MSI returned exit code $($proc.ExitCode)." 'WARNING'
+    }
+  } catch { _log "MSI install error: $($_.Exception.Message)" 'WARNING' }
+  return ,@($false,$null)
+}
+
 function Install-QuartoViaMSI {
     _log "Method 4: Official MSI (silent)..." "INFO"
     # x64 vs ARM64
@@ -202,3 +287,4 @@ try {
     Stop-ModuleTranscript
     if ($moduleLog) { _log "Module log: $moduleLog" "INFO" }
 }
+

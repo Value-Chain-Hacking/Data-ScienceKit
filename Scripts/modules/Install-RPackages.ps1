@@ -15,31 +15,29 @@ function Update-SessionPath {
     }
 }
 
-# Function to test if R is available
-# Instead of: R --version
-# Use: & "C:\Program Files\R\R-4.4.2\bin\x64\R.exe" --version
-# Or: Rscript --version
-
+# Function to test if R is available (Windows-specific)
 function Test-RAvailable {
     try {
-        # Try Rscript first (no alias conflicts)
-        $rVersion = Rscript --version 2>&1
-        if ($rVersion -match "R scripting front-end version") {
-            return $true
-        }
-        
-        # Fallback to full path
-        $rVersion = & "C:\Program Files\R\R-4.4.2\bin\x64\R.exe" --version 2>&1
+        # Try R.exe first (avoids PowerShell alias conflicts)
+        $rVersion = R.exe --version 2>&1
         if ($rVersion -match "R version") {
             return $true
         }
     } catch {
-        return $false
+        # Try Rscript as fallback
+        try {
+            $rscriptVersion = Rscript.exe --version 2>&1
+            if ($rscriptVersion -match "R scripting front-end version") {
+                return $true
+            }
+        } catch {
+            return $false
+        }
     }
     return $false
 }
 
-# Function to install R packages with error handling
+# Function to install R packages with proper Windows syntax and error handling
 function Install-RPackage {
     param(
         [string]$PackageName,
@@ -49,17 +47,26 @@ function Install-RPackage {
     try {
         Write-Host "  Installing $DisplayName..." -ForegroundColor Cyan
         
-        # Create R command to install package
-        $rCommand = "if (!require('$PackageName', quietly = TRUE)) { install.packages('$PackageName', repos = 'https://cran.rstudio.com/', dependencies = TRUE, quiet = TRUE) }"
+        # Use R.exe with proper Windows syntax - don't hide errors
+        $installCommand = "if (!require('$PackageName', quietly=TRUE)) { install.packages('$PackageName', repos='https://cran.rstudio.com/', dependencies=TRUE); cat('INSTALLED') } else { cat('ALREADY_PRESENT') }"
         
-        # Execute R command
-        $result = R --slave -e $rCommand 2>&1
+        $result = R.exe --slave -e $installCommand 2>&1
         
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "    + $DisplayName installed successfully" -ForegroundColor Green
-            return $true
+        if ($result -like "*INSTALLED*" -or $result -like "*ALREADY_PRESENT*") {
+            # Verify the package actually loads
+            $verifyResult = R.exe --slave -e "cat(ifelse(require('$PackageName', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+            if ($verifyResult -eq "OK") {
+                Write-Host "    + $DisplayName installed and verified" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "    - $DisplayName installation succeeded but package won't load" -ForegroundColor Red
+                return $false
+            }
         } else {
             Write-Host "    - $DisplayName installation failed" -ForegroundColor Red
+            if ($result -and $result -notlike "*ALREADY_PRESENT*") {
+                Write-Host "      Error: $result" -ForegroundColor Gray
+            }
             return $false
         }
     } catch {
@@ -88,28 +95,39 @@ try {
     
     Write-Host "R is available. Proceeding with package installation..." -ForegroundColor Green
     
-    # Get R version info
+    # Get R version info using proper Windows syntax
     try {
-        $rVersionInfo = R --slave -e "cat(R.version.string)" 2>$null
+        $rVersionInfo = R.exe --slave -e "cat(R.version.string)" 2>$null
         Write-Host "R Version: $rVersionInfo" -ForegroundColor Gray
     } catch {
         Write-Host "R Version: Could not determine" -ForegroundColor Gray
     }
     
-    # Define essential R packages
+    # Define essential R packages (prioritize critical ones first)
     $essentialPackages = @(
-        @{ Package = "tidyverse"; Display = "tidyverse (Data manipulation & visualization)" },
+        @{ Package = "rmarkdown"; Display = "rmarkdown (R Markdown - CRITICAL)" },
+        @{ Package = "knitr"; Display = "knitr (Dynamic reports - CRITICAL)" },
         @{ Package = "ggplot2"; Display = "ggplot2 (Graphics)" },
         @{ Package = "dplyr"; Display = "dplyr (Data manipulation)" },
         @{ Package = "readr"; Display = "readr (Data import)" },
-        @{ Package = "knitr"; Display = "knitr (Dynamic reports)" },
-        @{ Package = "rmarkdown"; Display = "rmarkdown (R Markdown)" },
         @{ Package = "readxl"; Display = "readxl (Excel files)" },
         @{ Package = "openxlsx"; Display = "openxlsx (Excel writing)" },
         @{ Package = "DBI"; Display = "DBI (Database interface)" },
-        @{ Package = "RSQLite"; Display = "RSQLite (SQLite driver)" },
         @{ Package = "here"; Display = "here (File paths)" },
-        @{ Package = "lubridate"; Display = "lubridate (Date/time)" }
+        @{ Package = "lubridate"; Display = "lubridate (Date/time)" },
+        @{ Package = "tidyverse"; Display = "tidyverse (Meta-package - install last)" },
+        # Add these packages to your existing $essentialPackages array:
+
+        @{ Package = "stringr"; Display = "stringr (String manipulation)" },
+        @{ Package = "tidyr"; Display = "tidyr (Data reshaping)" },
+        @{ Package = "fmsb"; Display = "fmsb (Radar charts)" },
+        @{ Package = "scales"; Display = "scales (Plot scaling)" },
+        @{ Package = "viridis"; Display = "viridis (Color palettes)" },
+        @{ Package = "patchwork"; Display = "patchwork (Plot composition)" },
+        @{ Package = "RColorBrewer"; Display = "RColorBrewer (Color schemes)" },
+        @{ Package = "gridExtra"; Display = "gridExtra (Grid graphics)" },
+        @{ Package = "png"; Display = "png (PNG support)" },
+        @{ Package = "kableExtra"; Display = "kableExtra (Enhanced tables)" }
     )
     
     # Track installation results
@@ -121,9 +139,13 @@ try {
     Write-Host "This may take several minutes as R compiles packages..." -ForegroundColor Gray
     Write-Host ""
     
-    # Set CRAN mirror and install packages
+    # Set CRAN mirror using proper Windows syntax
     Write-Host "Setting CRAN mirror..." -ForegroundColor Cyan
-    R --slave -e "options(repos = c(CRAN = 'https://cran.rstudio.com/'))" 2>$null
+    try {
+        R.exe --slave -e "options(repos = c(CRAN = 'https://cran.rstudio.com/'))" 2>$null
+    } catch {
+        Write-Host "  Could not set CRAN mirror (continuing anyway)" -ForegroundColor Yellow
+    }
     
     # Install each package
     foreach ($pkg in $essentialPackages) {
@@ -144,19 +166,19 @@ try {
     Write-Host "Successfully installed: $successCount" -ForegroundColor Green
     Write-Host "Failed: $failureCount" -ForegroundColor $(if ($failureCount -gt 0) { "Red" } else { "Gray" })
     
-    # Test key packages
+    # Test critical packages specifically
     Write-Host ""
-    Write-Host "Testing key package loading..." -ForegroundColor Cyan
+    Write-Host "Testing critical package loading..." -ForegroundColor Cyan
     
-    $testPackages = @("ggplot2", "dplyr", "readr", "knitr")
-    $loadSuccesses = 0
+    $criticalPackages = @("rmarkdown", "knitr", "ggplot2", "dplyr")
+    $criticalSuccesses = 0
     
-    foreach ($testPkg in $testPackages) {
+    foreach ($testPkg in $criticalPackages) {
         try {
-            $loadTest = R --slave -e "cat(ifelse(require('$testPkg', quietly=TRUE), '$testPkg OK', '$testPkg FAILED'))" 2>$null
-            if ($loadTest -like "*OK*") {
+            $loadTest = R.exe --slave -e "cat(ifelse(require('$testPkg', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+            if ($loadTest -eq "OK") {
                 Write-Host "  + $testPkg loads successfully" -ForegroundColor Green
-                $loadSuccesses++
+                $criticalSuccesses++
             } else {
                 Write-Host "  - $testPkg failed to load" -ForegroundColor Red
             }
@@ -165,40 +187,43 @@ try {
         }
     }
     
-    # Check if tidyverse meta-package worked
+    # Check tidyverse specifically (often fails)
     Write-Host ""
     Write-Host "Checking tidyverse meta-package..." -ForegroundColor Cyan
     try {
-        $tidyverseTest = R --slave -e "cat(ifelse(require('tidyverse', quietly=TRUE), 'tidyverse OK', 'tidyverse FAILED'))" 2>$null
-        if ($tidyverseTest -like "*OK*") {
+        $tidyverseTest = R.exe --slave -e "cat(ifelse(require('tidyverse', quietly=TRUE), 'OK', 'FAILED'))" 2>$null
+        if ($tidyverseTest -eq "OK") {
             Write-Host "  + tidyverse meta-package working" -ForegroundColor Green
         } else {
-            Write-Host "  - tidyverse meta-package not working" -ForegroundColor Yellow
+            Write-Host "  - tidyverse meta-package not working (individual packages may still work)" -ForegroundColor Yellow
         }
     } catch {
         Write-Host "  - tidyverse test error" -ForegroundColor Red
     }
     
-    # Final status
-    if ($successCount -eq $totalPackages -and $loadSuccesses -eq $testPackages.Count) {
+    # Final status based on critical packages
+    if ($criticalSuccesses -eq $criticalPackages.Count) {
         Write-Host ""
-        Write-Host "All essential R packages installed and working!" -ForegroundColor Green
+        Write-Host "All critical R packages installed and working!" -ForegroundColor Green
+        Write-Host "R environment is ready for Quarto and data analysis." -ForegroundColor Green
         exit 0
-    } elseif ($successCount -gt ($totalPackages * 0.7)) {
+    } elseif ($criticalSuccesses -ge 2) {
         Write-Host ""
-        Write-Host "Most essential R packages installed successfully." -ForegroundColor Yellow
-        Write-Host "Some packages failed but core R functionality should work." -ForegroundColor Yellow
+        Write-Host "Most critical R packages are working." -ForegroundColor Yellow
+        Write-Host "R environment should function for basic tasks." -ForegroundColor Yellow
         exit 0
     } else {
         Write-Host ""
-        Write-Host "Multiple R package installations failed." -ForegroundColor Red
-        Write-Host "R environment may not be fully functional." -ForegroundColor Red
+        Write-Host "Critical R package installations failed." -ForegroundColor Red
+        Write-Host "R environment may not be functional for Quarto rendering." -ForegroundColor Red
         
         Write-Host ""
-        Write-Host "Common solutions:" -ForegroundColor Yellow
-        Write-Host "1. Install Rtools if on Windows" -ForegroundColor Yellow
+        Write-Host "Troubleshooting steps:" -ForegroundColor Yellow
+        Write-Host "1. Install Rtools: https://cran.r-project.org/bin/windows/Rtools/" -ForegroundColor Yellow
         Write-Host "2. Update R to latest version" -ForegroundColor Yellow
-        Write-Host "3. Try installing packages manually in R console" -ForegroundColor Yellow
+        Write-Host "3. Try installing packages manually in R console:" -ForegroundColor Yellow
+        Write-Host "   R.exe" -ForegroundColor Cyan
+        Write-Host "   install.packages(c('rmarkdown', 'knitr'))" -ForegroundColor Cyan
         
         # Don't fail completely - some packages might still work
         exit 0
@@ -208,7 +233,8 @@ try {
     Write-Host "ERROR: Unexpected error during R package installation." -ForegroundColor Red
     Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host ""
-    Write-Host "You can try installing packages manually in R:" -ForegroundColor Yellow
-    Write-Host 'install.packages(c("tidyverse", "knitr", "rmarkdown", "readxl"))' -ForegroundColor Cyan
+    Write-Host "Manual installation in R console:" -ForegroundColor Yellow
+    Write-Host "R.exe" -ForegroundColor Cyan
+    Write-Host "install.packages(c('rmarkdown', 'knitr', 'ggplot2', 'dplyr'))" -ForegroundColor Cyan
     exit 1
 }
